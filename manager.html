@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager T-Shop</title>
+    <!-- Usamos los mismos estilos base pero adaptados -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="manager.css">
+</head>
+<body>
+
+    <!-- SIDEBAR / NAV -->
+    <nav class="sidebar">
+        <div class="brand">
+            TS MANAGER
+        </div>
+        <button class="nav-item active" onclick="switchView('orders', this)">
+            <span class="material-icons-round">receipt_long</span> Pedidos
+        </button>
+        <button class="nav-item" onclick="switchView('inventory', this)">
+            <span class="material-icons-round">inventory_2</span> Inventario
+        </button>
+        <button class="nav-item" onclick="switchView('featured', this)">
+            <span class="material-icons-round">star</span> Destacados
+        </button>
+        <button class="nav-item logout" onclick="window.location.href='index.html'">
+            <span class="material-icons-round">logout</span> Salir
+        </button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+        
+        <!-- VISTA PEDIDOS -->
+        <section id="view-orders">
+            <header class="header">
+                <h1>Gestión de Pedidos</h1>
+                <button class="btn-refresh" onclick="loadOrders()"><span class="material-icons-round">refresh</span></button>
+            </header>
+            
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-val" id="kpi-pending">0</div>
+                    <div class="kpi-lbl">Pendientes</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-val" id="kpi-total-today">$0</div>
+                    <div class="kpi-lbl">Vendido Hoy</div>
+                </div>
+            </div>
+
+            <div id="orders-list" class="list-container">
+                <!-- Se llena con JS -->
+                <p class="loading">Cargando pedidos...</p>
+            </div>
+        </section>
+
+        <!-- VISTA INVENTARIO -->
+        <section id="view-inventory" style="display: none;">
+            <header class="header">
+                <h1>Inventario & Fotos</h1>
+                
+                <div class="search-box">
+                    <span class="material-icons-round">search</span>
+                    <input type="text" id="search-prod" placeholder="Buscar por nombre, código..." oninput="searchProducts(this.value)">
+                </div>
+            </header>
+
+            <div id="inventory-list" class="grid-container">
+                <!-- Se llena con JS -->
+            </div>
+        </section>
+
+        <!-- VISTA DE DESTACADOS -->
+        <section id="view-featured" style="display: none;">
+            <header class="header">
+                <h1>Carrusel de Destacados</h1>
+            </header>
+        
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: var(--accent); margin-bottom: 15px;">⭐ En el Banner</h3>
+                    <div id="featured-active-list" class="list-container"></div>
+                </div>
+        
+                <div>
+                    <h3 style="margin-bottom: 15px;">Agregar Nuevo</h3>
+                    <input type="text" placeholder="Buscar producto para destacar..." 
+                           oninput="searchForFeature(this.value)" 
+                           style="width: 100%; padding: 10px; background: #333; border: none; color: white; border-radius: 6px; margin-bottom: 15px;">
+                    <div id="featured-search-list" class="list-container"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL CARGA FOTO -->
+    <div id="modal-photo" class="modal hidden">
+        <div class="modal-content">
+            <h3>Actualizar Foto</h3>
+            <p id="modal-prod-name" style="margin-bottom: 15px; color: var(--accent);">Producto</p>
+            
+            <!-- NUEVO SELECTOR DE ORIENTACIÓN -->
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="display:block; margin-bottom:5px; font-size:0.8rem; color:#888;">¿Cómo se debe ver?</label>
+                <div style="display: flex; gap: 10px;">
+                    <label style="background:#333; padding:10px; border-radius:6px; cursor:pointer; flex:1; text-align:center;">
+                        <input type="radio" name="img-orient" value="vertical" checked>
+                        📱 Vertical
+                        <div style="font-size:0.6rem; color:#aaa;">(Celulares/Botellas)</div>
+                    </label>
+                    <label style="background:#333; padding:10px; border-radius:6px; cursor:pointer; flex:1; text-align:center;">
+                        <input type="radio" name="img-orient" value="horizontal">
+                        🖼️ Horizontal
+                        <div style="font-size:0.6rem; color:#aaa;">(Cajas/Laptops)</div>
+                    </label>
+                </div>
+            </div>
+
+            <input type="file" id="file-input" accept="image/*">
+            <div class="actions">
+                <button onclick="closeModal()">Cancelar</button>
+                <button class="primary" onclick="uploadPhoto()">Guardar y Subir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-order-details" class="modal hidden">
+        <div class="modal-content" style="width: 600px; max-width: 95%; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                <h2 style="margin: 0;">Pedido #<span id="detail-id"></span></h2>
+                <button onclick="closeOrderModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+    
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div style="background: #252525; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--accent); margin-top: 0;">👤 Cliente</h4>
+                    <p id="detail-client" style="margin: 5px 0; font-weight: bold;"></p>
+                    <p id="detail-cedula" style="margin: 5px 0; font-size: 0.9rem; color: #ccc;"></p>
+                    <p id="detail-phone" style="margin: 5px 0; font-size: 0.9rem; color: #ccc;"></p>
+                    <a id="btn-whatsapp" href="#" target="_blank" style="display: block; text-align: center; margin-top: 10px; background: #25D366; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-weight: bold; font-size: 0.9rem;">
+                        <span class="material-icons-round" style="font-size: 14px; vertical-align: middle;">chat</span> Contactar por WhatsApp
+                    </a>
+                </div>
+    
+                <div style="background: #252525; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: var(--accent); margin-top: 0;">📍 Envío</h4>
+                    <p id="detail-city" style="margin: 5px 0; font-weight: bold;"></p>
+                    <p id="detail-address" style="margin: 5px 0; font-size: 0.9rem; color: #ccc;"></p>
+                    <p id="detail-barrio" style="margin: 5px 0; font-size: 0.9rem; color: #ccc;"></p>
+                    <p id="detail-date" style="margin: 10px 0 0 0; font-size: 0.8rem; color: #888; text-align: right;"></p>
+                </div>
+            </div>
+    
+            <h4 style="margin-bottom: 10px;">🛒 Productos</h4>
+            <div id="detail-products" style="background: #111; padding: 10px; border-radius: 8px; margin-bottom: 20px; max-height: 150px; overflow-y: auto;">
+                </div>
+    
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; padding-top: 15px;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);">
+                    Total: <span id="detail-total"></span>
+                </div>
+                <div id="detail-actions">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="manager.js"></script>
+</body>
+</html>

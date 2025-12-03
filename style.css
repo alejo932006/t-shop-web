@@ -1,0 +1,35 @@
+
+/* Animaciones */
+.fade-in { 
+    animation: fadeIn 0.5s ease-in-out; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* Scrollbar Personalizado */
+::-webkit-scrollbar { 
+    width: 8px; 
+}
+::-webkit-scrollbar-track { 
+    background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb { 
+    background: #f97316; 
+    border-radius: 4px; 
+}
+::-webkit-scrollbar-thumb:hover { 
+    background: #c2410c; 
+}
+
+/* Patrón de fondo */
+.bg-pattern {
+    background-image: radial-gradient(#ffffff 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+.perspective-1000 {
+    perspective: 1000px;
+}
