@@ -46,7 +46,13 @@
         /* Clase utilitaria para textos con el gradiente de tu logo */
         .text-gradient-brand {
             background: linear-gradient(to right, #FF3D00, #FFEB3B);
+            
+            /* Esta es la que ya tenías */
             -webkit-background-clip: text;
+            
+            /* AGREGA ESTA LÍNEA NUEVA: */
+            background-clip: text;
+            
             -webkit-text-fill-color: transparent;
         }
         .bg-gradient-brand {
