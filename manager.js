@@ -175,7 +175,7 @@ async function loadInventory() {
     container.innerHTML = '<p class="loading">Cargando catálogo...</p>';
     
     try {
-        const res = await fetch('http://localhost:3000/api/products');
+        const res = await fetch(`${API_URL}/products`);
         allProducts = await res.json();
         renderProducts(allProducts);
     } catch(e) {
