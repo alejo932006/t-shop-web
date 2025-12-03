@@ -15,16 +15,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+// --- CONFIGURACIÓN FIJA ---
+const API_BASE_URL = 'https://api.tshoptechnology.com'; // Tu servidor real
+
 // --- ESTADO ---
 let allProducts = [];
 let cart = JSON.parse(localStorage.getItem('tshop_cart')) || [];
-let currentMode = 'tunnel';
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     // Listeners UI Globales
     document.getElementById('cart-btn').onclick = () => toggleCart();
-    document.getElementById('config-btn').onclick = () => document.getElementById('config-panel').classList.toggle('hidden');
     document.getElementById('menu-btn').onclick = () => {
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
@@ -35,45 +36,63 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('back-to-cart-btn').onclick = showCartList;
     document.getElementById('checkout-form').onsubmit = submitOrder;
 
-    // Listeners Conexión
-    document.getElementById('connect-tunnel-btn').onclick = fetchTunnelData;
-    document.querySelectorAll('input[name="mode"]').forEach(radio => {
-        radio.addEventListener('change', (e) => setMode(e.target.value));
-    });
-
-    // Check inicial modo
-    const checkedRadio = document.querySelector('input[name="mode"]:checked');
-    if (checkedRadio) setMode(checkedRadio.value);
-    else setMode('tunnel');
-
     updateCartUI();
+    
+    // CONEXIÓN AUTOMÁTICA AL INICIAR
+    fetchTunnelData();
 });
 
 // --- API & DATA ---
 
 async function fetchTunnelData() {
-    const urlInput = document.getElementById('tunnel-url');
-    let url = urlInput.value.trim() || 'https://api.tshoptechnology.com';
-    if (!url) url = 'http://localhost:3000';
-    else url = url.replace(/\/$/, "");
-    
     showLoader(true);
     document.getElementById('error-message')?.classList.add('hidden');
+    
+    // Actualizar indicador visual (badge verde)
+    const badge = document.getElementById('connection-badge');
+    if(badge) badge.innerHTML = `<i data-lucide="loader" class="animate-spin w-3 h-3"></i> Conectando...`;
 
     try {
-        const res = await fetch(`${url}/api/products`);
+        // Usamos la URL fija de tu dominio
+        const res = await fetch(`${API_BASE_URL}/api/products`);
+        
         if (!res.ok) throw new Error("Error conectando a API");
         
         allProducts = await res.json();
+        
+        // Si hay éxito:
         generateFilters();
-        renderProducts(allProducts);
-        renderCarousel(allProducts)
+        // IMPORTANTE: Recuerda que cambiamos renderProducts para la paginación
+        // Aquí llamamos a la función que inicia el renderizado
+        renderProducts(allProducts); 
+        
+        // Renderizar carrusel si existe la función
+        if(typeof renderCarousel === 'function') renderCarousel(allProducts);
+
+        if(badge) {
+            badge.className = "flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-[10px] font-black border border-green-200 uppercase tracking-wide";
+            badge.innerHTML = `<i data-lucide="wifi" class="w-3 h-3"></i> Online`;
+        }
+        
         showLoader(false);
     } catch (err) {
-        alert(`Error de Conexión: ${err.message}`);
+        console.error(err);
         showLoader(false);
-        renderProducts([]);
+        if(badge) {
+            badge.className = "flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1 rounded-full text-[10px] font-black border border-red-200 uppercase tracking-wide";
+            badge.innerHTML = `<i data-lucide="wifi-off" class="w-3 h-3"></i> Offline`;
+        }
+        
+        // Mostrar mensaje de error amigable en la grilla
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-10">
+                <p class="text-gray-400">No se pudo conectar con el servidor.</p>
+                <button onclick="fetchTunnelData()" class="mt-4 text-brand-orange font-bold underline">Reintentar</button>
+            </div>
+        `;
     }
+    lucide.createIcons();
 }
 
 // --- RENDERIZADO PRODUCTOS ---
