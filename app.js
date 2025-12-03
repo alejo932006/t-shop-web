@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchTunnelData() {
     const urlInput = document.getElementById('tunnel-url');
-    let url = urlInput.value.trim();
+    let url = urlInput.value.trim() || 'https://api.tshoptechnology.com';
     if (!url) url = 'http://localhost:3000';
     else url = url.replace(/\/$/, "");
     
