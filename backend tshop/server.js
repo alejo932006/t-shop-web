@@ -34,7 +34,7 @@ const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'FacturaAPP', // Tu DB real
-  password: 'admin', // Pon tu contraseña real aquí
+  password: '0534', // Pon tu contraseña real aquí
   port: 5432,
 });
 
@@ -54,7 +54,7 @@ app.get('/api/products', async (req, res) => {
           linea: p.area_encargada,
           descripcion: `Stock: ${p.cantidad} ${p.unidad_medida}`,
           orientacion: p.imagen_orientacion || 'vertical',
-          imagen_url: p.imagen_url ? `http://localhost:${port}${p.imagen_url}` : null,
+          imagen_url: p.imagen_url ? `https://api.tshoptechnology.com${p.imagen_url}` : null,
           destacado: p.es_destacado // <--- NUEVO CAMPO
       }));
       res.json(productos);
@@ -134,7 +134,7 @@ app.post('/api/manager/upload-image', upload.single('image'), async (req, res) =
           'UPDATE productos SET imagen_url = $1, imagen_orientacion = $2 WHERE codigo = $3', 
           [imageUrl, orientation, productId]
       );
-      res.json({ success: true, imageUrl: `http://localhost:${port}${imageUrl}` });
+      res.json({ success: true, imageUrl: `https://api.tshoptechnology.com${imageUrl}` });
   } catch (err) { res.status(500).send(err.message); }
 });
 
