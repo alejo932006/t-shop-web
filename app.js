@@ -677,5 +677,16 @@ window.toggleContactModal = () => {
     lucide.createIcons();
 };
 
+window.toggleHowItWorks = () => {
+    const modal = document.getElementById('modal-how-it-works');
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('fade-in'); 
+    } else {
+        modal.classList.add('hidden');
+    }
+    lucide.createIcons();
+};
+
 
 lucide.createIcons();

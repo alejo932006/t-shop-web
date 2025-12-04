@@ -102,7 +102,7 @@
                 <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-orange transition-all group-hover:w-full"></span>
             </a>
             <a href="#" onclick="toggleContactModal()" class="hover:text-brand-orange transition-colors relative group">
-                Contacto
+                Nosotros
                 <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-orange transition-all group-hover:w-full"></span>
             </a>
         </nav>
@@ -155,7 +155,8 @@
                     <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                     Comprar Ahora
                 </a>
-                <button class="px-8 py-4 rounded-full border border-gray-700 hover:border-brand-yellow hover:text-brand-yellow transition-all font-bold bg-white/5 backdrop-blur-sm">
+                <button onclick="toggleHowItWorks()" class="px-8 py-4 rounded-full border border-gray-700 hover:border-brand-yellow hover:bg-gray-800 hover:text-brand-yellow transition-all font-bold bg-white/5 backdrop-blur-sm flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-5 h-5"></i>
                     Saber más
                 </button>
             </div>
@@ -602,10 +603,20 @@
                         </div>
                     
                         <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 mt-2">
+    
                             <div class="flex justify-between font-bold text-gray-800 text-lg">
-                                <span>Total:</span>
+                                <span>Total Productos:</span>
                                 <span id="checkout-total-display">$0</span>
                             </div>
+                        
+                            <div class="mt-2 pt-2 border-t border-orange-200 flex items-start gap-2">
+                                <i data-lucide="truck" class="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0"></i>
+                                <p class="text-xs text-orange-800 leading-tight">
+                                    <strong>Nota importante:</strong> El costo del envío <u>NO está incluido</u>. 
+                                    <br>Se cotiza según tu ubicación y lo pagas al recibir (Contraentrega).
+                                </p>
+                            </div>
+                        
                         </div>
                     
                         <button type="submit" class="w-full mt-4 bg-gray-900 hover:bg-brand-orange text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center gap-2 text-lg">
@@ -617,6 +628,76 @@
             </div>
         </div>
     </div>
+
+    <div id="modal-how-it-works" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-80 transition-opacity backdrop-blur-sm" onclick="toggleHowItWorks()"></div>
+    
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-lg border border-gray-100">
+                
+                <button onclick="toggleHowItWorks()" class="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-900 bg-gray-100 rounded-full p-1 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+    
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-6 text-white text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full bg-white opacity-5 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+                    <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto mb-3 text-brand-orange relative z-10"></i>
+                    <h3 class="text-2xl font-black relative z-10">Proceso de Compra</h3>
+                    <p class="text-gray-300 text-xs uppercase tracking-widest relative z-10">Simple, Humano y Seguro</p>
+                </div>
+    
+                <div class="p-6 space-y-6">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-brand-orange flex items-center justify-center font-bold text-lg border border-orange-100">1</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Elige tus productos</h4>
+                            <p class="text-sm text-gray-500">Agrega lo que te guste al carrito y presiona "Finalizar Compra".</p>
+                        </div>
+                    </div>
+    
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-brand-orange flex items-center justify-center font-bold text-lg border border-orange-100">2</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Confirma tus datos</h4>
+                            <p class="text-sm text-gray-500">Llena el formulario. <span class="text-red-500 font-bold text-xs bg-red-50 px-2 py-0.5 rounded">¡No pedimos pagos aquí!</span></p>
+                        </div>
+                    </div>
+    
+                    <div class="flex gap-4 relative">
+                        <div class="absolute left-5 top-10 bottom-[-20px] w-0.5 bg-gray-100 -z-10"></div>
+                        
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold border border-green-200">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Redirección a WhatsApp</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Al confirmar, el sistema abrirá un chat con nosotros. <br>
+                                <strong>¿Por qué?</strong> Para tu seguridad, no usamos pasarelas automáticas. Un asesor real verificará stock y coordinará el pago contigo.
+                            </p>
+                        </div>
+                    </div>
+    
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold border border-blue-100">
+                            <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Pago y Envío</h4>
+                            <p class="text-sm text-gray-500">Pagas por <strong>Bancolombia, Nequi</strong> o tarjeta (Link MercadoPago) directamente en el chat y despachamos tu pedido.</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="bg-gray-50 p-4 border-t border-gray-100 text-center">
+                    <button onclick="toggleHowItWorks()" class="text-brand-orange font-bold text-sm hover:underline">
+                        ¡Entendido, quiero comprar!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>

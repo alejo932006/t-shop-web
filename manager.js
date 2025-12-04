@@ -1,29 +1,36 @@
 const API_URL = 'https://api.tshoptechnology.com/api';
 let allProducts = [];
 let currentEditId = null;
+let isLoggedIn = false;
+
+function checkAuth() {
+    if(!isLoggedIn) {
+        document.getElementById('login-screen').style.display = 'flex';
+        return false;
+    }
+    return true;
+}
+
 
 // --- NAVEGACIÓN ---
 function switchView(viewName, btn) {
-    // 1. Ocultar TODAS las vistas (Agregamos la de destacados a la lista de ocultar)
+    if (!checkAuth()) return; // Protección
+
     document.getElementById('view-orders').style.display = 'none';
     document.getElementById('view-inventory').style.display = 'none';
+    document.getElementById('view-featured').style.display = 'none';
+    document.getElementById('view-users').style.display = 'none'; // Ocultar el nuevo también
     
-    // Verificamos si existe la sección antes de ocultarla (para evitar errores si no ha cargado)
-    const featuredSection = document.getElementById('view-featured');
-    if (featuredSection) featuredSection.style.display = 'none';
-    
-    // 2. Gestionar clases activas del menú (Visual del botón presionado)
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     if(btn) btn.classList.add('active');
     
-    // 3. Mostrar la vista deseada
     const viewToShow = document.getElementById(`view-${viewName}`);
     if (viewToShow) viewToShow.style.display = 'block';
 
-    // 4. Cargar datos frescos según la pestaña
     if(viewName === 'orders') loadOrders();
     if(viewName === 'inventory') loadInventory();
-    if(viewName === 'featured') loadFeaturedView(); // <--- Asegúrate de que esta línea esté aquí
+    if(viewName === 'featured') loadFeaturedView();
+    if(viewName === 'users') loadUsers(); // <--- NUEVO
 }
 
 // ==========================================
@@ -512,4 +519,99 @@ async function saveDescription() {
     }
 }
 
-loadOrders();
+// ==========================================
+// MÓDULO DE LOGIN
+// ==========================================
+async function doLogin() {
+    const u = document.getElementById('login-user').value;
+    const p = document.getElementById('login-pass').value;
+    const err = document.getElementById('login-error');
+
+    if(!u || !p) { err.innerText = "Completa los campos"; err.style.display = 'block'; return; }
+
+    try {
+        const res = await fetch(`${API_URL}/manager/login`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ usuario: u, password: p })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            isLoggedIn = true;
+            document.getElementById('login-screen').style.display = 'none';
+            loadOrders(); // Cargar datos iniciales
+        } else {
+            err.innerText = "Usuario o contraseña incorrectos";
+            err.style.display = 'block';
+        }
+    } catch(e) {
+        err.innerText = "Error de conexión con el servidor";
+        err.style.display = 'block';
+    }
+}
+
+// ==========================================
+// MÓDULO DE USUARIOS (CRUD)
+// ==========================================
+async function loadUsers() {
+    const container = document.getElementById('users-list');
+    container.innerHTML = '<p class="loading">Cargando...</p>';
+    try {
+        const res = await fetch(`${API_URL}/manager/users`);
+        const users = await res.json();
+        
+        container.innerHTML = '';
+        users.forEach(u => {
+            const div = document.createElement('div');
+            div.className = 'order-card';
+            // Botón eliminar (No permitimos borrar al admin por seguridad básica)
+            const deleteBtn = u.usuario === 'admin' 
+                ? '<span style="color:#666; font-size:0.8rem;">(Principal)</span>' 
+                : `<button onclick="deleteUser(${u.id})" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Eliminar</button>`;
+            
+            div.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="material-icons-round" style="color:#888;">person</span>
+                    <strong>${u.usuario}</strong>
+                </div>
+                ${deleteBtn}
+            `;
+            container.appendChild(div);
+        });
+    } catch(e) { container.innerHTML = 'Error al cargar usuarios.'; }
+}
+
+async function createUser() {
+    const u = document.getElementById('new-user-name').value;
+    const p = document.getElementById('new-user-pass').value;
+    if(!u || !p) return alert("Completa ambos campos");
+
+    try {
+        const res = await fetch(`${API_URL}/manager/users`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ usuario: u, password: p })
+        });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+            loadUsers();
+            alert("Usuario creado correctamente");
+        } else {
+            alert(data.message);
+        }
+    } catch(e) { alert("Error al crear usuario"); }
+}
+
+async function deleteUser(id) {
+    if(!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+    try {
+        await fetch(`${API_URL}/manager/users/${id}`, { method: 'DELETE' });
+        loadUsers();
+    } catch(e) { alert("Error al eliminar"); }
+}
+
+
+// loadOrders();

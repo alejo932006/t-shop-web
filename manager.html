@@ -11,11 +11,21 @@
 </head>
 <body>
 
-    <!-- SIDEBAR / NAV -->
-    <nav class="sidebar">
-        <div class="brand">
-            TS MANAGER
+    <div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: var(--accent); font-size: 3rem; margin: 0;">TS MANAGER</h1>
+            <p style="color: #666;">Acceso Restringido</p>
         </div>
+        <div style="background: var(--card); padding: 40px; border-radius: 12px; border: 1px solid #333; width: 350px;">
+            <input type="text" id="login-user" placeholder="Usuario" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #444; color: white; border-radius: 6px;">
+            <input type="password" id="login-pass" placeholder="Contraseña" style="width: 100%; padding: 12px; margin-bottom: 20px; background: #111; border: 1px solid #444; color: white; border-radius: 6px;">
+            <button onclick="doLogin()" style="width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer;">INGRESAR</button>
+            <p id="login-error" style="color: var(--danger); text-align: center; margin-top: 15px; font-size: 0.9rem; display: none;"></p>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="brand">TS MANAGER</div>
         <button class="nav-item active" onclick="switchView('orders', this)">
             <span class="material-icons-round">receipt_long</span> Pedidos
         </button>
@@ -25,7 +35,11 @@
         <button class="nav-item" onclick="switchView('featured', this)">
             <span class="material-icons-round">star</span> Destacados
         </button>
-        <button class="nav-item logout" onclick="window.location.href='index.html'">
+        <button class="nav-item" onclick="switchView('users', this)">
+            <span class="material-icons-round">group</span> Usuarios
+        </button>
+        
+        <button class="nav-item logout" onclick="window.location.reload()">
             <span class="material-icons-round">logout</span> Salir
         </button>
     </nav>
