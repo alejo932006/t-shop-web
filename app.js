@@ -138,15 +138,9 @@ window.loadMoreProducts = () => {
     // Calcular el siguiente lote
     const nextBatch = currentListForDisplay.slice(itemsShown, itemsShown + ITEMS_PER_BATCH);
     
-    // 1. DEFINIR LA RUTA DEL PLACEHOLDER
-    // Asegúrate de que API_BASE_URL esté definida al inicio de tu archivo app.js
-    const placeholderSrc = `${API_BASE_URL}/uploads/placeholder.png`;
-
     // Renderizar este lote
     nextBatch.forEach(p => {
         const precio = formatCurrency(p.precio);
-        
-        // Clases base para cuando la imagen SÍ existe
         let imgClass = p.orientacion === 'horizontal' 
             ? "h-56 w-full object-cover group-hover:scale-105 transition duration-500" 
             : "h-56 w-full object-contain p-4 group-hover:scale-105 transition duration-500 mix-blend-multiply";
@@ -155,22 +149,15 @@ window.loadMoreProducts = () => {
             ? "h-56 w-full overflow-hidden bg-gray-100"
             : "h-56 w-full bg-white flex items-center justify-center";
 
-        // 2. LÓGICA DE IMAGEN ACTUALIZADA
-        // - Si hay URL: Intenta cargarla. Si falla (onerror), cambia el src al placeholder y agrega clases grises/pequeñas.
-        // - Si NO hay URL: Carga directamente el placeholder con estilos "opacity-40 grayscale p-12".
-        const imgContent = p.imagen_url 
-            ? `<div class="${containerClass}">
-                 <img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}"
-                      onerror="this.onerror=null; this.src='${placeholderSrc}'; this.classList.remove('object-cover', 'p-4'); this.classList.add('object-contain', 'opacity-40', 'grayscale', 'p-12');">
-               </div>`
-            : `<div class="h-56 w-full flex items-center justify-center bg-gray-50 overflow-hidden">
-                 <img src="${placeholderSrc}" class="h-full w-full object-contain opacity-40 grayscale p-12" alt="Sin imagen">
-               </div>`;
+            const placeholderWeb = '<div class="h-56 w-full flex items-center justify-center bg-gray-50"><i data-lucide="image" class="w-12 h-12 text-gray-300"></i></div>';
+            const imgContent = p.imagen_url 
+                ? `<div class="${containerClass}"><img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}" onerror="this.parentElement.outerHTML = '${placeholderWeb.replace(/"/g, "&quot;")}'"></div>`
+                : placeholderWeb;
 
         const card = document.createElement('div');
+        // Añadimos 'fade-in' para que los nuevos aparezcan suavemente
         card.className = "bg-white rounded-xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 flex flex-col cursor-pointer fade-in relative";
         
-        // Evento click en la tarjeta (abre modal)
         card.onclick = (e) => { if(!e.target.closest('.add-btn-direct')) openModal(p); };
 
         card.innerHTML = `
@@ -203,16 +190,16 @@ window.loadMoreProducts = () => {
     document.getElementById('showing-count').innerText = itemsShown;
     document.getElementById('total-count').innerText = currentListForDisplay.length;
 
-    // Decidir si mostramos u ocultamos el botón "Ver más"
+    // Decidir si mostramos u ocultamos el botón
     if (itemsShown >= currentListForDisplay.length) {
         btnContainer.classList.add('hidden'); // Ya mostramos todo
     } else {
         btnContainer.classList.remove('hidden'); // Faltan productos
     }
 
-    // Refrescar iconos
     lucide.createIcons();
 };
+
 // --- LOGICA CARRITO Y CHECKOUT ---
 
 window.showCheckoutForm = () => {
