@@ -190,17 +190,18 @@ function renderProducts(list) {
     const container = document.getElementById('inventory-list');
     container.innerHTML = '';
 
-    // 1. Definimos el HTML del icono genérico (placeholder)
-    // Usamos comillas simples para facilitar su inserción dentro del atributo onerror
-    const placeholderHTML = `
-        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a1a;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-            </svg>
-        </div>`;
+    // 1. DEFINICIÓN LIMPIA DEL PLACEHOLDER (PAISAJE GRIS)
+    // Usamos comillas dobles dentro del HTML para evitar conflictos luego.
+    // Todo en una sola línea para evitar errores de saltos de línea en JavaScript.
+    const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`;
+    
+    const placeholderHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a1a;">${svgIcon}</div>`;
 
-        // Eliminamos saltos de línea y escapamos comillas para el onerror
-        const safePlaceholderManager = placeholderHTML.replace(/\n/g, '').replace(/"/g, "&quot;");  
+    // 2. PREPARAR STRING PARA EL ERROR (ONERROR)
+    // El truco: Para meter HTML dentro de un atributo onerror="this.outerHTML='...'",
+    // el contenido NO puede tener comillas simples. Reemplazamos las dobles por comillas simples escapadas si fuera necesario,
+    // pero aquí usaremos comillas dobles dentro (escapadas como &quot;) para que el envoltorio '...' funcione.
+    const safeErrorHTML = placeholderHTML.replace(/"/g, "&quot;");
 
     list.forEach(p => {
         const div = document.createElement('div');
@@ -209,18 +210,21 @@ function renderProducts(list) {
         const precioFormateado = Number(p.precio).toLocaleString('es-CO', { maximumFractionDigits: 0 });
         const stockFormateado = Number(p.cantidad); 
 
-        // 2. Lógica de la imagen con manejo de errores (onerror)
-        // Si hay URL, intentamos cargar la imagen.
-        // Si falla (onerror), reemplazamos la etiqueta <img> por el placeholderHTML.
-        // Si no hay URL, mostramos directamente el placeholderHTML.
-        const imgDisplay = p.imagen_url 
-            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML = '${placeholderHTML}'">` 
-            : placeholderHTML;
+        // 3. LÓGICA DE IMAGEN ROBUSTA
+        // Si hay URL, creamos la etiqueta IMG. Si falla, el onerror reemplaza la etiqueta por el div del paisaje.
+        // Si NO hay URL, ponemos el div del paisaje directamente.
+        let imgDisplay;
+        if (p.imagen_url && p.imagen_url.trim() !== '') {
+            imgDisplay = `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML='${safeErrorHTML}'">`;
+        } else {
+            imgDisplay = placeholderHTML;
+        }
 
-        // Verificamos si ya tiene descripción
+        // Verificamos si ya tiene descripción para el color del botón
         const hasDesc = p.descripcion && !p.descripcion.startsWith('Stock disponible');
         const btnColor = hasDesc ? 'var(--accent)' : '#666';
 
+        // 4. INYECTAR HTML
         div.innerHTML = `
             <div class="prod-img" style="height: 180px;">
                 ${imgDisplay}
