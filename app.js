@@ -149,9 +149,10 @@ window.loadMoreProducts = () => {
             ? "h-56 w-full overflow-hidden bg-gray-100"
             : "h-56 w-full bg-white flex items-center justify-center";
 
-        const imgContent = p.imagen_url 
-            ? `<div class="${containerClass}"><img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}"></div>`
-            : `<div class="h-56 w-full flex items-center justify-center bg-gray-50"><i data-lucide="image" class="w-12 h-12 text-gray-300"></i></div>`;
+            const placeholderWeb = '<div class="h-56 w-full flex items-center justify-center bg-gray-50"><i data-lucide="image" class="w-12 h-12 text-gray-300"></i></div>';
+            const imgContent = p.imagen_url 
+                ? `<div class="${containerClass}"><img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}" onerror="this.parentElement.outerHTML = '${placeholderWeb.replace(/"/g, "&quot;")}'"></div>`
+                : placeholderWeb;
 
         const card = document.createElement('div');
         // Añadimos 'fade-in' para que los nuevos aparezcan suavemente
@@ -399,10 +400,11 @@ window.openModal = (p) => {
     document.getElementById('modal-unit').innerText = p.unidad || 'UN';
     document.getElementById('modal-category').innerText = p.linea || 'General';
 
+    const placeholderModal = '<i data-lucide="package" class="w-24 h-24 text-gray-300"></i>';
     const container = document.getElementById('modal-img-container');
     container.innerHTML = p.imagen_url 
-        ? `<img src="${p.imagen_url}" class="max-h-full max-w-full object-contain">` 
-        : `<i data-lucide="package" class="w-24 h-24 text-gray-300"></i>`;
+        ? `<img src="${p.imagen_url}" class="max-h-full max-w-full object-contain" onerror="this.outerHTML = '${placeholderModal.replace(/"/g, "&quot;")}'">` 
+        : placeholderModal;
 
     document.getElementById('modal-add-btn').onclick = () => {
         addToCartById(p.id);

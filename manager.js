@@ -189,6 +189,10 @@ async function loadInventory() {
 function renderProducts(list) {
     const container = document.getElementById('inventory-list');
     container.innerHTML = '';
+
+    // 1. Definimos el HTML del icono genérico (placeholder)
+    // Usamos comillas simples para facilitar su inserción dentro del atributo onerror
+    const placeholderHTML = '<span class="material-icons-round" style="font-size:48px; color:#333;">image</span>';
     
     list.forEach(p => {
         const div = document.createElement('div');
@@ -197,11 +201,15 @@ function renderProducts(list) {
         const precioFormateado = Number(p.precio).toLocaleString('es-CO', { maximumFractionDigits: 0 });
         const stockFormateado = Number(p.cantidad); 
 
+        // 2. Lógica de la imagen con manejo de errores (onerror)
+        // Si hay URL, intentamos cargar la imagen.
+        // Si falla (onerror), reemplazamos la etiqueta <img> por el placeholderHTML.
+        // Si no hay URL, mostramos directamente el placeholderHTML.
         const imgDisplay = p.imagen_url 
-            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;">` 
-            : `<span class="material-icons-round" style="font-size:48px; color:#333;">image</span>`;
+            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML = '${placeholderHTML}'">` 
+            : placeholderHTML;
 
-        // Verificamos si ya tiene descripción para cambiar el color del icono (Visual Feedback)
+        // Verificamos si ya tiene descripción
         const hasDesc = p.descripcion && !p.descripcion.startsWith('Stock disponible');
         const btnColor = hasDesc ? 'var(--accent)' : '#666';
 
