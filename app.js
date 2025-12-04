@@ -149,9 +149,15 @@ window.loadMoreProducts = () => {
             ? "h-56 w-full overflow-hidden bg-gray-100"
             : "h-56 w-full bg-white flex items-center justify-center";
 
-            const placeholderWeb = '<div class="h-56 w-full flex items-center justify-center bg-gray-50"><i data-lucide="image" class="w-12 h-12 text-gray-300"></i></div>';
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`;
+
+            const placeholderWeb = `<div class="h-56 w-full flex items-center justify-center bg-gray-50">${svgIcon}</div>`;
+            
+            // Sanitizamos el string para que no rompa el atributo HTML onerror
+            const safePlaceholder = placeholderWeb.replace(/"/g, "&quot;");
+            
             const imgContent = p.imagen_url 
-                ? `<div class="${containerClass}"><img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}" onerror="this.parentElement.outerHTML = '${placeholderWeb.replace(/"/g, "&quot;")}'"></div>`
+                ? `<div class="${containerClass}"><img src="${p.imagen_url}" class="${imgClass}" loading="lazy" alt="${p.nombre}" onerror="this.parentElement.outerHTML = '${safePlaceholder}'"></div>`
                 : placeholderWeb;
 
         const card = document.createElement('div');

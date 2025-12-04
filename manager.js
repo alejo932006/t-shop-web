@@ -192,8 +192,20 @@ function renderProducts(list) {
 
     // 1. Definimos el HTML del icono genérico (placeholder)
     // Usamos comillas simples para facilitar su inserción dentro del atributo onerror
-    const placeholderHTML = '<img src="/uploads/placeholder.png" alt="Sin imagen" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.4; filter: grayscale(1); margin: auto;">';
-    
+    const placeholderHTML = `
+        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#1a1a1a;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+        </div>`;
+
+        // Eliminamos saltos de línea y escapamos comillas para el onerror
+        const safePlaceholderManager = placeholderHTML.replace(/\n/g, '').replace(/"/g, "&quot;");
+
+        const imgDisplay = p.imagen_url 
+            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML = '${safePlaceholderManager}'">` 
+            : placeholderHTML;    
+            
     list.forEach(p => {
         const div = document.createElement('div');
         div.className = 'prod-card';
