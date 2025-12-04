@@ -226,15 +226,19 @@ window.showCartList = () => {
     document.getElementById('back-to-cart-btn').classList.add('hidden');
 };
 
+// Busca tu función submitOrder existente y reemplázala por esta:
+
 async function submitOrder(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.innerHTML;
+    
+    // Feedback visual de carga
     btn.disabled = true;
-    btn.innerHTML = `<i data-lucide="loader" class="animate-spin w-5 h-5"></i> Enviando...`;
+    btn.innerHTML = `<i data-lucide="loader" class="animate-spin w-5 h-5"></i> Procesando...`;
     lucide.createIcons();
 
-    // RECOLECCIÓN DE DATOS ACTUALIZADA
+    // 1. Recolectar Datos
     const orderData = {
         nombre: document.getElementById('cust-name').value,
         cedula: document.getElementById('cust-cedula').value,
@@ -247,7 +251,8 @@ async function submitOrder(e) {
         barrio: document.getElementById('cust-barrio').value,
         
         metodo: document.getElementById('cust-method').value,
-        total: getFinalTotal((acc, item) => acc + (item.precio * item.qty), 0),
+        // Usamos tu función auxiliar para calcular el total con recargo si aplica
+        total: getFinalTotal(), 
         productos: cart
     };
 
@@ -256,6 +261,7 @@ async function submitOrder(e) {
     url = url.replace(/\/$/, "");
 
     try {
+        // 2. Guardar en Base de Datos (Backend)
         const res = await fetch(`${url}/api/checkout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -265,13 +271,50 @@ async function submitOrder(e) {
         const data = await res.json();
 
         if (data.success) {
-            alert(`¡Pedido Confirmado!\nID de Orden: #${data.orderId}\nGracias por tu compra.`);
-            cart = []; // Limpiar carrito
+            // ============================================================
+            // 3. LÓGICA DE WHATSAPP (NUEVO)
+            // ============================================================
+            
+            // A. Construir lista de productos para el mensaje
+            const itemsList = cart.map(i => `▪️ ${i.qty}x ${i.nombre}`).join('\n');
+            
+            // B. Mensaje personalizado según método de pago
+            let actionText = "Quedo atento para coordinar el envío.";
+            if (orderData.metodo === 'Transferencia') actionText = "Envíame los datos de Bancolombia/Nequi por favor.";
+            if (orderData.metodo === 'MercadoPago') actionText = "Hola, solicito el Link de Pago.";
+
+            // C. Armar el mensaje completo
+            const waMessage = 
+`Hola T-Shop! 👋 Acabo de hacer el pedido *#${data.orderId}* en la web.
+
+👤 *Cliente:* ${orderData.nombre}
+📍 *Ciudad:* ${orderData.ciudad}
+💰 *Total:* ${formatCurrency(orderData.total)} (${orderData.metodo})
+
+🛒 *Resumen:*
+${itemsList}
+
+${actionText}`;
+
+            // D. Codificar URL (Asegúrate de poner TU número real, código 57 Colombia)
+            // El número lo tomé de tu index.html (316 529 4505)
+            const storePhone = "573165294505"; 
+            const waUrl = `https://wa.me/${storePhone}?text=${encodeURIComponent(waMessage)}`;
+
+            // 4. Confirmación y Redirección
+            // Usamos confirm() nativo para que el usuario sepa que va a salir de la página
+            if(confirm(`¡Pedido #${data.orderId} Guardado con Éxito! ✅\n\nPresiona ACEPTAR para finalizar tu compra en WhatsApp.`)) {
+                window.open(waUrl, '_blank'); // Abre en nueva pestaña
+            }
+
+            // 5. Limpieza
+            cart = []; 
             saveCart();
             updateCartUI();
-            toggleCart(false); // Cerrar
-            showCartList(); // Resetear vista
-            e.target.reset(); // Limpiar form
+            toggleCart(false); 
+            showCartList(); 
+            e.target.reset(); 
+
         } else {
             throw new Error(data.error || "Error desconocido");
         }
