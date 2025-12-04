@@ -124,6 +124,27 @@
             </div>
         </section>
 
+        <section id="view-users" style="display: none;">
+            <header class="header">
+                <h1>Gestión de Usuarios</h1>
+            </header>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                <div style="background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content;">
+                    <h3 style="margin-top: 0; color: var(--accent);">Nuevo Usuario</h3>
+                    <input type="text" id="new-user-name" placeholder="Nombre de usuario" class="input-mini" style="margin-bottom: 10px;">
+                    <input type="password" id="new-user-pass" placeholder="Contraseña" class="input-mini" style="margin-bottom: 10px;">
+                    <button onclick="createUser()" class="btn-save" style="background: var(--success);">Crear Usuario</button>
+                </div>
+
+                <div>
+                    <h3>Usuarios Activos</h3>
+                    <div id="users-list" class="list-container">
+                        </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- MODAL CARGA FOTO -->
