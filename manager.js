@@ -200,12 +200,8 @@ function renderProducts(list) {
         </div>`;
 
         // Eliminamos saltos de línea y escapamos comillas para el onerror
-        const safePlaceholderManager = placeholderHTML.replace(/\n/g, '').replace(/"/g, "&quot;");
+        const safePlaceholderManager = placeholderHTML.replace(/\n/g, '').replace(/"/g, "&quot;");  
 
-        const imgDisplay = p.imagen_url 
-            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.outerHTML = '${safePlaceholderManager}'">` 
-            : placeholderHTML;    
-            
     list.forEach(p => {
         const div = document.createElement('div');
         div.className = 'prod-card';
