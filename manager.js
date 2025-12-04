@@ -192,7 +192,7 @@ function renderProducts(list) {
 
     // 1. Definimos el HTML del icono genérico (placeholder)
     // Usamos comillas simples para facilitar su inserción dentro del atributo onerror
-    const placeholderHTML = '<span class="material-icons-round" style="font-size:48px; color:#333;">image</span>';
+    const placeholderHTML = '<img src="/uploads/placeholder.png" alt="Sin imagen" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.4; filter: grayscale(1); margin: auto;">';
     
     list.forEach(p => {
         const div = document.createElement('div');
