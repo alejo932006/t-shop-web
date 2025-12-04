@@ -31,38 +31,42 @@ function switchView(viewName, btn) {
 // ==========================================
 let allOrders = []; // Variable global para guardar pedidos
 
+// C. ACTUALIZAR LOADORDERS (Para limpiar el input al recargar)
 async function loadOrders() {
     const container = document.getElementById('orders-list');
     container.innerHTML = '<p class="loading">Cargando pedidos...</p>';
 
     try {
         const res = await fetch(`${API_URL}/manager/orders`);
-        allOrders = await res.json(); // Guardamos en la variable global
+        allOrders = await res.json(); 
         
-        // Actualizar KPIs
+        // --- KPI logic (se mantiene igual) ---
         const pending = allOrders.filter(o => o.estado === 'PENDIENTE').length;
         document.getElementById('kpi-pending').innerText = pending;
-        
         const today = new Date().toISOString().slice(0,10);
         const totalToday = allOrders
             .filter(o => o.fecha_pedido.startsWith(today) && o.estado !== 'CANCELADO')
             .reduce((acc, o) => acc + Number(o.total_venta), 0);
         document.getElementById('kpi-total-today').innerText = `$${totalToday.toLocaleString()}`;
+        // -------------------------------------
+
+        // LIMPIAR AMBOS CAMPOS DE FECHA
+        document.getElementById('date-start').value = '';
+        document.getElementById('date-end').value = '';
         
-        renderOrdersList();
+        renderOrdersList(allOrders);
 
     } catch (e) {
         console.error(e);
         container.innerHTML = '<p>Error de conexión con el servidor.</p>';
     }
 }
-
-function renderOrdersList() {
+function renderOrdersList(listToRender = allOrders) { 
     const container = document.getElementById('orders-list');
     container.innerHTML = '';
 
-    if(allOrders.length === 0) {
-        container.innerHTML = '<p>No hay pedidos registrados.</p>';
+    if(listToRender.length === 0) {
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">No se encontraron pedidos en esta fecha.</div>';
         return;
     }
 
@@ -78,17 +82,15 @@ function renderOrdersList() {
     `;
     container.appendChild(header);
 
-    // Filas
-    allOrders.forEach(o => {
+    // Filas (Usamos listToRender en lugar de allOrders)
+    listToRender.forEach(o => {
         const div = document.createElement('div');
         div.className = 'order-row';
-        // Estilo de fila
         div.style.cssText = "display: grid; grid-template-columns: 0.5fr 1.5fr 1fr 1fr 1fr; padding: 15px 10px; border-bottom: 1px solid #333; cursor: pointer; transition: background 0.2s; align-items: center;";
         div.onmouseover = () => div.style.background = '#222';
         div.onmouseout = () => div.style.background = 'transparent';
-        div.onclick = () => openOrderDetails(o.id); // ABRIR MODAL AL CLICK
+        div.onclick = () => openOrderDetails(o.id);
 
-        // Color del estado
         const statusColor = o.estado === 'PENDIENTE' ? '#FFC107' : '#00C853';
 
         div.innerHTML = `
@@ -192,44 +194,51 @@ function renderProducts(list) {
         const div = document.createElement('div');
         div.className = 'prod-card';
         
-        // Formatear precio visualmente (Puntos de mil y sin decimales)
         const precioFormateado = Number(p.precio).toLocaleString('es-CO', { maximumFractionDigits: 0 });
-        const stockFormateado = Number(p.cantidad); // Quita el ,00 del stock si lo tuviera
+        const stockFormateado = Number(p.cantidad); 
 
         const imgDisplay = p.imagen_url 
-            ? `<img src="${p.imagen_url}" alt="${p.nombre}">` 
+            ? `<img src="${p.imagen_url}" alt="${p.nombre}" style="width: 100%; height: 100%; object-fit: cover;">` 
             : `<span class="material-icons-round" style="font-size:48px; color:#333;">image</span>`;
 
+        // Verificamos si ya tiene descripción para cambiar el color del icono (Visual Feedback)
+        const hasDesc = p.descripcion && !p.descripcion.startsWith('Stock disponible');
+        const btnColor = hasDesc ? 'var(--accent)' : '#666';
+
         div.innerHTML = `
-            <div class="prod-img">
+            <div class="prod-img" style="height: 180px;">
                 ${imgDisplay}
                 <button class="btn-photo" onclick="openPhotoModal('${p.id}', '${p.nombre}')">
                     <span class="material-icons-round">add_a_photo</span>
                 </button>
-                <span style="position:absolute; top:5px; left:5px; background:rgba(0,0,0,0.6); color:white; font-size:0.6rem; padding:2px 4px; border-radius:3px; backdrop-filter:blur(2px);">
+                <span style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.7); color:white; font-size:0.6rem; font-weight:bold; padding:4px 8px; border-radius:4px; backdrop-filter:blur(4px); letter-spacing: 1px;">
                     ${p.orientacion === 'horizontal' ? 'HORIZ' : 'VERT'}
                 </span>
             </div>
             
-            <div class="prod-body">
-                <div class="prod-title" title="${p.nombre}">${p.nombre}</div>
+            <div class="prod-body" style="padding: 20px;">
+                <div class="prod-title" title="${p.nombre}" style="font-size: 1.1rem; margin-bottom: 20px;">${p.nombre}</div>
                 
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Precio Venta</label>
-                        <div class="currency-wrapper">
-                            <span class="currency-symbol">$</span>
-                            <input type="text" id="price-${p.id}" class="input-mini" value="${precioFormateado}">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #333;">
+                    <div style="text-align: center;">
+                        <label style="font-size: 0.7rem; color: #888; letter-spacing: 1px; display: block; margin-bottom: 5px; font-weight: bold;">PRECIO</label>
+                        <div style="font-size: 1.3rem; font-weight: 900; color: var(--success); letter-spacing: -0.5px;">
+                            $${precioFormateado}
                         </div>
                     </div>
-                    
-                    <div class="input-group">
-                        <label>Stock</label>
-                        <input type="number" id="stock-${p.id}" class="input-mini" value="${stockFormateado}" style="padding-left:10px; text-align:center;">
+                    <div style="text-align: center; border-left: 1px solid #333;">
+                        <label style="font-size: 0.7rem; color: #888; letter-spacing: 1px; display: block; margin-bottom: 5px; font-weight: bold;">STOCK</label>
+                        <div style="font-size: 1.3rem; font-weight: 900; color: white; letter-spacing: -0.5px;">
+                            ${stockFormateado} <span style="font-size: 0.8rem; font-weight: normal; color: #aaa;">UND</span>
+                        </div>
                     </div>
                 </div>
 
-                <button class="btn-save" onclick="updateProduct('${p.id}')">Guardar Cambios</button>
+                <button onclick="openDescModal('${p.id}')" 
+                        style="width: 100%; margin-top: 15px; background: #222; border: 1px solid #333; color: #ccc; padding: 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;">
+                    <span class="material-icons-round" style="font-size: 18px; color: ${btnColor};">description</span>
+                    <span style="font-size: 0.85rem; font-weight: bold;">Editar Descripción Web</span>
+                </button>
             </div>
         `;
         container.appendChild(div);
@@ -401,9 +410,86 @@ async function toggleFeature(id, status) {
     } catch(e) { alert("Error al actualizar"); }
 }
 
-// MODIFICAR switchView para incluir el caso 'featured'
-// Busca tu función switchView existente y agrega:
-// if(viewName === 'featured') loadFeaturedView();
+function filterOrders() {
+    const startVal = document.getElementById('date-start').value;
+    const endVal = document.getElementById('date-end').value;
 
-// Inicializar cargando los pedidos
+    // Si no hay fechas seleccionadas, mostrar todo
+    if (!startVal && !endVal) {
+        renderOrdersList(allOrders);
+        return;
+    }
+
+    const filtered = allOrders.filter(o => {
+        // Tomamos solo la parte YYYY-MM-DD de la fecha del pedido (primeros 10 caracteres)
+        // Ejemplo: "2025-12-04T15:30:00" -> "2025-12-04"
+        const orderDate = o.fecha_pedido.substring(0, 10);
+
+        // Lógica de validación
+        // 1. Si hay fecha inicio, la orden debe ser mayor o igual
+        if (startVal && orderDate < startVal) return false;
+        
+        // 2. Si hay fecha fin, la orden debe ser menor o igual
+        if (endVal && orderDate > endVal) return false;
+
+        return true;
+    });
+    
+    renderOrdersList(filtered);
+}
+
+// --- GESTIÓN DE DESCRIPCIONES ---
+let currentDescId = null;
+
+function openDescModal(id) {
+    currentDescId = id;
+    const p = allProducts.find(x => String(x.id) === String(id));
+    if(!p) return;
+
+    document.getElementById('desc-prod-name').innerText = p.nombre;
+    
+    // Si la descripción es la genérica de stock, mostramos el campo vacío para escribir desde cero
+    const isGeneric = p.descripcion && p.descripcion.startsWith('Stock disponible');
+    document.getElementById('desc-text-input').value = isGeneric ? '' : (p.descripcion || '');
+    
+    document.getElementById('modal-desc-edit').classList.remove('hidden');
+}
+
+function closeDescModal() {
+    document.getElementById('modal-desc-edit').classList.add('hidden');
+    currentDescId = null;
+}
+
+async function saveDescription() {
+    const text = document.getElementById('desc-text-input').value;
+    const btn = document.querySelector('#modal-desc-edit .primary');
+    const originalText = btn.innerText;
+    
+    btn.innerText = 'Guardando...';
+    
+    try {
+        const res = await fetch(`${API_URL}/manager/description/${currentDescId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ description: text })
+        });
+        
+        if(res.ok) {
+            // Actualizar localmente
+            const p = allProducts.find(x => String(x.id) === String(currentDescId));
+            if(p) p.descripcion = text;
+            
+            closeDescModal();
+            renderProducts(allProducts); // Recargar para ver si cambia el color del icono
+            alert("Descripción actualizada correctamente en la web.");
+        } else {
+            alert("Error al guardar.");
+        }
+    } catch(e) {
+        alert("Error de conexión.");
+    } finally {
+        btn.innerText = originalText;
+    }
+}
+
 loadOrders();

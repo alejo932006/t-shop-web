@@ -32,12 +32,27 @@
 
     <!-- MAIN CONTENT -->
     <main class="content">
-        
         <!-- VISTA PEDIDOS -->
         <section id="view-orders">
             <header class="header">
                 <h1>Gestión de Pedidos</h1>
-                <button class="btn-refresh" onclick="loadOrders()"><span class="material-icons-round">refresh</span></button>
+                
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    
+                    <div style="display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 8px; border: 1px solid #444;">
+                        <input type="date" id="date-start" onchange="filterOrders()" title="Fecha Inicio"
+                               style="background: transparent; color: white; border: none; font-family: 'Inter'; color-scheme: dark; outline: none;">
+                        
+                        <span style="color: #666; font-weight: bold;">➔</span>
+                        
+                        <input type="date" id="date-end" onchange="filterOrders()" title="Fecha Fin"
+                               style="background: transparent; color: white; border: none; font-family: 'Inter'; color-scheme: dark; outline: none;">
+                    </div>
+        
+                    <button class="btn-refresh" onclick="loadOrders()" title="Limpiar filtros">
+                        <span class="material-icons-round">refresh</span>
+                    </button>
+                </div>
             </header>
             
             <div class="kpi-row">
@@ -165,6 +180,22 @@
                 </div>
                 <div id="detail-actions">
                     </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-desc-edit" class="modal hidden">
+        <div class="modal-content" style="width: 500px; max-width: 90%;">
+            <h3 style="margin-bottom: 15px;">Editar Descripción Web</h3>
+            <p id="desc-prod-name" style="color: var(--accent); margin-bottom: 10px; font-weight: bold;"></p>
+            
+            <textarea id="desc-text-input" rows="6" 
+                      placeholder="Escribe aquí los detalles del producto que verá el cliente..."
+                      style="width: 100%; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; resize: vertical; font-family: 'Inter';"></textarea>
+    
+            <div class="actions">
+                <button onclick="closeDescModal()">Cancelar</button>
+                <button class="primary" onclick="saveDescription()">Guardar Descripción</button>
             </div>
         </div>
     </div>
