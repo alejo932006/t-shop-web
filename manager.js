@@ -273,8 +273,21 @@ function renderProducts(list) {
 }
 
 function searchProducts(term) {
+    // Convertimos lo que escribes a minúsculas para comparar fácil
     const lower = term.toLowerCase();
-    const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(lower));
+    
+    const filtered = allProducts.filter(p => {
+        // 1. Buscamos en el NOMBRE
+        const nameMatch = p.nombre.toLowerCase().includes(lower);
+        
+        // 2. Buscamos en el ID (que es tu CÓDIGO)
+        // Convertimos el ID a string (texto) por si es un número puro
+        const codeMatch = String(p.id).toLowerCase().includes(lower);
+        
+        // Retornamos los que coincidan con uno O con el otro
+        return nameMatch || codeMatch;
+    });
+
     renderProducts(filtered);
 }
 
