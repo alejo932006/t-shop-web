@@ -698,6 +698,80 @@
         </div>
     </div>
 
+    <div id="modal-policies" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-80 transition-opacity backdrop-blur-sm" onclick="closePolicies()"></div>
+    
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-2xl border border-gray-200 max-h-[85vh] flex flex-col">
+                
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-xl font-black text-gray-900" id="policy-title">Información</h3>
+                    <button onclick="closePolicies()" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+    
+                <div class="p-6 overflow-y-auto custom-scrollbar text-sm text-gray-600 leading-relaxed space-y-4">
+                    
+                    <div id="content-warranty" class="hidden policy-content">
+                        <p>En <strong>T-Shop Technology</strong> nos tomamos muy en serio la calidad. Esta es nuestra política:</p>
+                        <ul class="list-disc pl-5 space-y-2 mt-2">
+                            <li><strong>Celulares Nuevos:</strong> 1 Año de garantía directa por defectos de fábrica (Software y Hardware interno).</li>
+                            <li><strong>Accesorios:</strong> 3 meses de garantía por funcionamiento.</li>
+                            <li><strong>No cubre:</strong> Humedad, golpes, display roto, apagados por mala actualización de software, sobrecargas eléctricas o uso de cargadores genéricos.</li>
+                        </ul>
+                        <p class="mt-4 p-3 bg-orange-50 text-orange-800 rounded border border-orange-100 text-xs font-bold">
+                            ⚠️ Importante: Para tramitar cualquier garantía es indispensable conservar la caja y los accesorios originales del producto.
+                        </p>
+                    </div>
+    
+                    <div id="content-shipping" class="hidden policy-content">
+                        <h4 class="font-bold text-gray-900 mb-2">🚚 Envíos</h4>
+                        <p>Realizamos envíos a todo Colombia a través de Interrapidísimo, Servientrega o Coordinadora.</p>
+                        <ul class="list-disc pl-5 space-y-2 mt-2">
+                            <li><strong>Tiempo de entrega:</strong> 1 a 3 días hábiles según la ciudad.</li>
+                            <li><strong>Costo:</strong> El envío <u>no está incluido</u> en el precio del producto. Se paga "Contraentrega" (le pagas el flete a la transportadora al recibir).</li>
+                        </ul>
+    
+                        <h4 class="font-bold text-gray-900 mt-6 mb-2">🔄 Devoluciones</h4>
+                        <p>Solo aceptamos devoluciones por <strong>garantía o defectos de fábrica</strong> reportados en los primeros 3 días. No hacemos devoluciones de dinero por "retracto de compra" si el equipo fue destapado y usado, debido a la naturaleza higiénica y de registro de los equipos tecnológicos.</p>
+                    </div>
+    
+                    <div id="content-privacy" class="hidden policy-content">
+                        <p>Cumpliendo con la Ley de Habeas Data, te informamos que:</p>
+                        <ol class="list-decimal pl-5 space-y-2 mt-2">
+                            <li>Tus datos (Nombre, Teléfono, Dirección) se usan <strong>únicamente</strong> para procesar tu pedido y generar la guía de envío.</li>
+                            <li>No vendemos ni compartimos tu información con terceros.</li>
+                            <li>No guardamos datos de tarjetas de crédito o bancarios, ya que los pagos se coordinan directamente por WhatsApp o plataformas seguras externas (MercadoPago/Nequi).</li>
+                        </ol>
+                    </div>
+    
+                    <div id="content-faq" class="hidden policy-content">
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-900 text-sm">¿Tienen tienda física?</h5>
+                                <p class="mt-1">¡Sí! Estamos en Caicedonia, Valle. Carrera 9 # 11-20 (Dentro del Supermercado Surtitodo, Local 2).</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-900 text-sm">¿Es seguro comprar aquí?</h5>
+                                <p class="mt-1">Totalmente. Llevamos más de 8 años en el mercado. Puedes ver nuestras referencias en Instagram o visitarnos personalmente.</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-gray-900 text-sm">¿Cómo pago mi pedido?</h5>
+                                <p class="mt-1">Al finalizar tu pedido en la web, te contactamos por WhatsApp. Puedes pagar por Bancolombia, Nequi, Daviplata, o Tarjeta de Crédito (vía MercadoPago con recargo del 3.29%).</p>
+                            </div>
+                        </div>
+                    </div>
+    
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 text-right">
+                    <button onclick="closePolicies()" class="px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded hover:bg-gray-800 transition-colors">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-gray-900 text-white pt-16 pb-8 border-t border-gray-800 relative z-10">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
@@ -730,10 +804,10 @@
                         <i data-lucide="compass" class="w-4 h-4"></i> Navegación
                     </h4>
                     <ul class="space-y-3 text-gray-400 text-sm font-medium">
-                        <li><a href="#" class="hover:text-brand-orange transition-colors flex items-center gap-2 hover:translate-x-1 duration-200">Inicio</a></li>
-                        <li><a href="#catalogo" class="hover:text-brand-orange transition-colors flex items-center gap-2 hover:translate-x-1 duration-200">Ver Catálogo</a></li>
-                        <li><button onclick="toggleContactModal()" class="hover:text-brand-orange transition-colors flex items-center gap-2 hover:translate-x-1 duration-200 text-left">Nuestra Historia</button></li>
-                        <li><button onclick="toggleHowItWorks()" class="hover:text-brand-orange transition-colors flex items-center gap-2 hover:translate-x-1 duration-200 text-left">Cómo Comprar</button></li>
+                        <li><button onclick="openPolicy('warranty')" class="hover:text-brand-orange transition-colors text-left w-full">Política de Garantía</button></li>
+                        <li><button onclick="openPolicy('shipping')" class="hover:text-brand-orange transition-colors text-left w-full">Envíos y Devoluciones</button></li>
+                        <li><button onclick="openPolicy('privacy')" class="hover:text-brand-orange transition-colors text-left w-full">Aviso de Privacidad</button></li>
+                        <li><button onclick="openPolicy('faq')" class="hover:text-brand-orange transition-colors text-left w-full">Preguntas Frecuentes</button></li>
                     </ul>
                 </div>
     

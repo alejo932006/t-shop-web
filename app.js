@@ -688,5 +688,38 @@ window.toggleHowItWorks = () => {
     lucide.createIcons();
 };
 
+// --- FUNCIONES DEL MODAL DE POLÍTICAS ---
+
+window.openPolicy = (type) => {
+    // 1. Ocultar todos los contenidos primero
+    document.querySelectorAll('.policy-content').forEach(el => el.classList.add('hidden'));
+    
+    // 2. Definir Título y Mostrar contenido específico
+    const modal = document.getElementById('modal-policies');
+    const title = document.getElementById('policy-title');
+    
+    if (type === 'warranty') {
+        title.innerText = "🛡️ Política de Garantía";
+        document.getElementById('content-warranty').classList.remove('hidden');
+    } else if (type === 'shipping') {
+        title.innerText = "📦 Envíos y Devoluciones";
+        document.getElementById('content-shipping').classList.remove('hidden');
+    } else if (type === 'privacy') {
+        title.innerText = "🔒 Aviso de Privacidad";
+        document.getElementById('content-privacy').classList.remove('hidden');
+    } else if (type === 'faq') {
+        title.innerText = "❓ Preguntas Frecuentes";
+        document.getElementById('content-faq').classList.remove('hidden');
+    }
+
+    // 3. Mostrar el modal con animación
+    modal.classList.remove('hidden');
+    modal.classList.add('fade-in');
+};
+
+window.closePolicies = () => {
+    document.getElementById('modal-policies').classList.add('hidden');
+};
+
 
 lucide.createIcons();
