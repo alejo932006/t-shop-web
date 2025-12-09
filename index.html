@@ -301,31 +301,16 @@
 
     </section>
 
-    <div class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-        <button id="config-btn" class="bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg border border-gray-600">
-            <i data-lucide="settings" class="w-6 h-6"></i>
-        </button>
-        <div id="config-panel" class="hidden bg-white p-5 rounded-xl shadow-2xl border border-gray-200 w-80 mb-2">
-            <h5 class="font-bold text-gray-800 mb-4 border-b pb-2">Configuración DB</h5>
-            <div class="space-y-3 mb-4">
-                <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-50 rounded">
-                    <input type="radio" name="mode" value="firebase" checked class="text-orange-500">
-                    <span class="text-sm font-semibold text-gray-700">Modo Simulación</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-50 rounded">
-                    <input type="radio" name="mode" value="tunnel" class="text-orange-500">
-                    <span class="text-sm font-semibold text-gray-700">Modo Local (Túnel)</span>
-                </label>
-            </div>
-            <div id="firebase-controls">
-                <button id="add-mock-btn" class="w-full bg-green-600 text-white text-xs font-bold py-2 px-4 rounded shadow-md">Crear Producto Test</button>
-            </div>
-            <div id="tunnel-controls" class="hidden space-y-2">
-                <input type="text" id="tunnel-url" value="https://api.tshoptechnology.com" placeholder="URL Cloudflare..." class="...">
-                <button id="connect-tunnel-btn" class="w-full bg-blue-600 text-white text-xs font-bold py-2 px-4 rounded">Conectar</button>
-            </div>
-        </div>
-    </div>
+    <a href="https://wa.me/573165294505" target="_blank" 
+    class="fixed bottom-4 right-4 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg shadow-green-500/40 transition-all hover:scale-110 flex items-center justify-center group">
+     <i data-lucide="message-circle" class="w-7 h-7"></i>
+     
+     <span class="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-20 animate-ping"></span>
+ 
+     <span class="absolute right-full mr-3 bg-white text-gray-800 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-gray-100">
+         ¿Dudas? ¡Escríbenos!
+     </span>
+ </a>
 
     <div id="product-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-black bg-opacity-70 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
