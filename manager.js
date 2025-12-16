@@ -3,6 +3,33 @@ let allProducts = [];
 let currentEditId = null;
 let isLoggedIn = false;
 
+async function authFetch(endpoint, options = {}) {
+    const token = localStorage.getItem('manager_token');
+    
+    // Configurar headers
+    const headers = options.headers || {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const config = {
+        ...options,
+        headers: headers
+    };
+
+    const res = await fetch(`${API_URL}${endpoint}`, config);
+
+    // Si el token expiró (Error 401 o 403), sacar al usuario
+    if (res.status === 401 || res.status === 403) {
+        alert("Tu sesión ha expirado. Por favor ingresa nuevamente.");
+        localStorage.removeItem('manager_token');
+        location.reload(); // Recarga para mostrar login
+        return null;
+    }
+    
+    return res;
+}
+
 function checkAuth() {
     if(!isLoggedIn) {
         document.getElementById('login-screen').style.display = 'flex';
@@ -44,8 +71,9 @@ async function loadOrders() {
     container.innerHTML = '<p class="loading">Cargando pedidos...</p>';
 
     try {
-        const res = await fetch(`${API_URL}/manager/orders`);
-        allOrders = await res.json(); 
+        const res = await authFetch('/manager/orders');
+        if(!res) return; // Si falló la auth, paramos
+        allOrders = await res.json();
         
         // --- KPI logic (se mantiene igual) ---
         const pending = allOrders.filter(o => o.estado === 'PENDIENTE').length;
@@ -165,7 +193,7 @@ async function changeStatus(id, newStatus) {
     if(!confirm(`¿Confirmas que el pedido #${id} ya fue despachado?`)) return;
     
     try {
-        await fetch(`${API_URL}/manager/orders/${id}`, {
+        await authFetch(`/manager/orders/${id}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ estado: newStatus })
@@ -296,19 +324,18 @@ async function updateProduct(id) {
     const priceInput = document.getElementById(`price-${id}`).value;
     const stockInput = document.getElementById(`stock-${id}`).value;
     
-    // LIMPIEZA DE DATOS: Quitamos puntos, comas y signos para enviar solo números
-    // Ejemplo: "5.500.000" -> "5500000"
+    // Limpieza de datos
     const cleanPrice = priceInput.replace(/\./g, '').replace(/,/g, '').replace('$', '').trim();
     
     const btn = document.querySelector(`button[onclick="updateProduct('${id}')"]`);
     const originalText = btn.innerText;
     
-    // Feedback visual inmediato
     btn.innerText = 'Guardando...';
     btn.style.background = '#333';
 
     try {
-        await fetch(`${API_URL}/manager/products/${id}`, {
+        // CORRECCIÓN AQUÍ: Usamos authFetch y quitamos ${API_URL} porque authFetch ya lo incluye
+        await authFetch(`/manager/products/${id}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ 
@@ -320,10 +347,9 @@ async function updateProduct(id) {
         btn.innerText = '¡Guardado!';
         btn.style.background = 'var(--success)';
         
-        // Restaurar botón después de 2 segundos
         setTimeout(() => {
             btn.innerText = originalText;
-            btn.style.background = ''; // Vuelve al estilo CSS original
+            btn.style.background = ''; 
         }, 2000);
         
     } catch(e) {
@@ -366,8 +392,12 @@ async function uploadPhoto() {
     btn.innerText = 'Subiendo...';
     
     try {
+        const token = localStorage.getItem('manager_token');
         const res = await fetch(`${API_URL}/manager/upload-image`, {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}` 
+            },
             body: formData
         });
         
@@ -437,16 +467,18 @@ function searchForFeature(term) {
 
 async function toggleFeature(id, status) {
     try {
-        await fetch(`${API_URL}/manager/feature/${id}`, {
+        // CORRECCIÓN AQUÍ: authFetch
+        await authFetch(`/manager/feature/${id}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ status })
         });
+        
         // Actualizar localmente y recargar UI
         const p = allProducts.find(x => String(x.id) === String(id));
         if(p) p.destacado = status;
         renderFeaturedUI();
-        document.getElementById('featured-search-list').innerHTML = ''; // Limpiar búsqueda
+        document.getElementById('featured-search-list').innerHTML = ''; 
     } catch(e) { alert("Error al actualizar"); }
 }
 
@@ -508,19 +540,20 @@ async function saveDescription() {
     btn.innerText = 'Guardando...';
     
     try {
-        const res = await fetch(`${API_URL}/manager/description/${currentDescId}`, {
+        // CORRECCIÓN AQUÍ: authFetch
+        const res = await authFetch(`/manager/description/${currentDescId}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ description: text })
         });
         
-        if(res.ok) {
-            // Actualizar localmente
+        // authFetch puede devolver null si falla la sesión, así que validamos 'res'
+        if(res && res.ok) {
             const p = allProducts.find(x => String(x.id) === String(currentDescId));
             if(p) p.descripcion = text;
             
             closeDescModal();
-            renderProducts(allProducts); // Recargar para ver si cambia el color del icono
+            renderProducts(allProducts);
             alert("Descripción actualizada correctamente en la web.");
         } else {
             alert("Error al guardar.");
@@ -551,14 +584,18 @@ async function doLogin() {
         const data = await res.json();
 
         if (data.success) {
+            // AQUI GUARDAMOS EL TOKEN
+            localStorage.setItem('manager_token', data.token);
+            
             isLoggedIn = true;
             document.getElementById('login-screen').style.display = 'none';
-            loadOrders(); // Cargar datos iniciales
+            loadOrders(); 
         } else {
-            err.innerText = "Usuario o contraseña incorrectos";
+            err.innerText = data.message || "Credenciales incorrectas";
             err.style.display = 'block';
         }
     } catch(e) {
+        console.error(e);
         err.innerText = "Error de conexión con el servidor";
         err.style.display = 'block';
     }
@@ -571,14 +608,16 @@ async function loadUsers() {
     const container = document.getElementById('users-list');
     container.innerHTML = '<p class="loading">Cargando...</p>';
     try {
-        const res = await fetch(`${API_URL}/manager/users`);
+        // CORRECCIÓN: authFetch
+        const res = await authFetch('/manager/users');
+        if(!res) return;
+        
         const users = await res.json();
         
         container.innerHTML = '';
         users.forEach(u => {
             const div = document.createElement('div');
             div.className = 'order-card';
-            // Botón eliminar (No permitimos borrar al admin por seguridad básica)
             const deleteBtn = u.usuario === 'admin' 
                 ? '<span style="color:#666; font-size:0.8rem;">(Principal)</span>' 
                 : `<button onclick="deleteUser(${u.id})" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Eliminar</button>`;
@@ -601,12 +640,16 @@ async function createUser() {
     if(!u || !p) return alert("Completa ambos campos");
 
     try {
-        const res = await fetch(`${API_URL}/manager/users`, {
+        // CORRECCIÓN: authFetch
+        const res = await authFetch('/manager/users', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ usuario: u, password: p })
         });
+        
+        if(!res) return;
         const data = await res.json();
+        
         if(data.success) {
             document.getElementById('new-user-name').value = '';
             document.getElementById('new-user-pass').value = '';
@@ -621,10 +664,10 @@ async function createUser() {
 async function deleteUser(id) {
     if(!confirm("¿Seguro que deseas eliminar este usuario?")) return;
     try {
-        await fetch(`${API_URL}/manager/users/${id}`, { method: 'DELETE' });
+        // CORRECCIÓN: authFetch
+        await authFetch(`/manager/users/${id}`, { method: 'DELETE' });
         loadUsers();
     } catch(e) { alert("Error al eliminar"); }
 }
-
 
 // loadOrders();
