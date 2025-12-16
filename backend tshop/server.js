@@ -10,6 +10,32 @@ const jwt = require('jsonwebtoken'); // <--- Librería de seguridad
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+const allowedOrigins = [
+    'https://tshoptechnology.com',       // Tu dominio principal
+    'https://www.tshoptechnology.com',   // Tu dominio con www
+    'http://localhost:3000',             // Para pruebas backend
+    'http://127.0.0.1:5500',             // Para pruebas frontend (Live Server)
+    'http://localhost:5500'              // Variación de Live Server
+  ];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permitir peticiones sin origen (como las de Postman o Apps móviles)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      // Si el origen no está en la lista, lo bloqueamos
+      const msg = 'La política CORS no permite el acceso desde este origen.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // Autorizamos explicitamente los headers que usas
+  credentials: true // Permite cookies/headers seguros si se requieren a futuro
+}));
+
 // Configuración de almacenamiento de imágenes
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -22,9 +48,9 @@ const storage = multer.diskStorage({
         cb(null, 'prod-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
+
 const upload = multer({ storage: storage });
 
-app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
