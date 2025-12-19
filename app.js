@@ -1,10 +1,24 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// --- IMPORTACIONES (Actualizadas a v12.7.0) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js"; 
 
+// --- CONFIGURACIÓN REAL DE FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAhoivPfV1D0qWYEH22xHQmQZgGWRu4BgU",
+  authDomain: "tshopweb-6215b.firebaseapp.com",
+  projectId: "tshopweb-6215b",
+  storageBucket: "tshopweb-6215b.firebasestorage.app",
+  messagingSenderId: "69888524320",
+  appId: "1:69888524320:web:7f6f984aa312bd5cd8fc45",
+  measurementId: "G-3V2RZNQJ8B"
+};
 
+// --- INICIALIZACIÓN ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const analytics = getAnalytics(app);
 
 // --- CONFIGURACIÓN FIJA ---
 const API_BASE_URL = 'https://api.tshoptechnology.com'; // Tu servidor real
