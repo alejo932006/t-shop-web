@@ -209,12 +209,18 @@ async function changeStatus(id, newStatus) {
 // ==========================================
 async function loadInventory() {
     const container = document.getElementById('inventory-list');
-    container.innerHTML = '<p class="loading">Cargando catálogo...</p>';
+    container.innerHTML = '<p class="loading">Cargando catálogo completo...</p>';
     
     try {
-        const res = await fetch(`${API_URL}/products`);
-        allProducts = await res.json();
-        renderProducts(allProducts);
+        // CAMBIO IMPORTANTE:
+        // Antes usabas fetch normal a la ruta pública.
+        // Ahora usamos authFetch (tu función segura) a la nueva ruta privada del manager.
+        const res = await authFetch('/manager/products-all');
+        
+        if (res) {
+            allProducts = await res.json();
+            renderProducts(allProducts);
+        }
     } catch(e) {
         console.error(e);
         container.innerHTML = '<p>Error al cargar productos.</p>';
