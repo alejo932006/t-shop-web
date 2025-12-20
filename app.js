@@ -261,17 +261,15 @@ async function submitOrder(e) {
         productos: cart
     };
 
-    const urlInput = document.getElementById('tunnel-url');
-    let url = urlInput.value.trim() || 'http://localhost:3000';
-    url = url.replace(/\/$/, "");
+        const url = API_BASE_URL; 
 
-    try {
-        // 2. Guardar en Base de Datos (Backend)
-        const res = await fetch(`${url}/api/checkout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-        });
+        try {
+            // 2. Guardar en Base de Datos (Backend)
+            const res = await fetch(`${url}/api/checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
 
         const data = await res.json();
 
