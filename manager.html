@@ -216,9 +216,16 @@
             </div>
 
             <input type="file" id="file-input" accept="image/*">
-            <div class="actions">
-                <button onclick="closeModal()">Cancelar</button>
-                <button class="primary" onclick="uploadPhoto()">Guardar y Subir</button>
+            <div class="actions" style="flex-direction: column; gap: 10px;">
+                <div style="display: flex; gap: 10px; justify-content: center; width: 100%;">
+                    <button onclick="closeModal()" style="flex: 1;">Cancelar</button>
+                    <button class="primary" onclick="uploadPhoto()" style="flex: 1;">Guardar y Subir</button>
+                </div>
+            
+                <button onclick="deleteCurrentPhoto()" style="background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 8px; border-radius: 6px; cursor: pointer; margin-top: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span>
+                    Quitar foto actual
+                </button>
             </div>
         </div>
     </div>

@@ -798,4 +798,65 @@ async function loadVisitors() {
     }
 }
 
+// ESTA ES LA FUNCIÓN QUE TE FALTA
+async function clearVisitors() {
+    if(!confirm("⚠️ ¿Estás SEGURO de vaciar todo el registro de IPs?\nEsta acción no se puede deshacer.")) {
+        return;
+    }
+
+    // Buscamos el botón para ponerle efecto de carga (opcional)
+    const btn = document.querySelector('button[onclick="clearVisitors()"]');
+    if(btn) btn.innerHTML = '...';
+
+    try {
+        const res = await authFetch('/manager/visitors', { method: 'DELETE' });
+        
+        if (res && res.ok) {
+            alert("Historial de visitas eliminado correctamente.");
+            loadVisitors(); // Recargar la lista (ahora vacía)
+        } else {
+            alert("Error al intentar borrar el historial.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión.");
+    } finally {
+        if(btn) btn.innerHTML = '<span class="material-icons-round">delete_sweep</span>';
+    }
+}
+
+// EN: manager.js (Agrega al final o cerca de uploadPhoto)
+
+async function deleteCurrentPhoto() {
+    if(!currentEditId) return;
+
+    if(!confirm("¿Seguro que quieres quitar la foto de este producto?\nPasará a la lista de 'Sin Fotos'.")) {
+        return;
+    }
+
+    const btn = document.querySelector('button[onclick="deleteCurrentPhoto()"]');
+    btn.innerText = "Eliminando...";
+    btn.disabled = true;
+
+    try {
+        const res = await authFetch(`/manager/product-image/${currentEditId}`, {
+            method: 'DELETE'
+        });
+
+        if(res && res.ok) {
+            closeModal();
+            loadInventory(); // Recarga la lista: Ahora el producto aparecerá en "Sin Fotos"
+            alert("Foto eliminada correctamente.");
+        } else {
+            alert("No se pudo eliminar la foto.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión.");
+    } finally {
+        btn.innerHTML = '<span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> Quitar foto actual';
+        btn.disabled = false;
+    }
+}
+
 // loadOrders();
