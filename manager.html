@@ -322,36 +322,8 @@
             </button>
         </div>
     </div>
-    
-    <script>
-        // Pequeño script para abrir el menú extra
-        function toggleMobMenu() {
-            document.getElementById('mob-menu-extra').classList.toggle('hidden');
-        }
-    
-        // Modificar switchView para que también active los botones móviles
-        const originalSwitch = switchView;
-        switchView = function(viewName, btn) {
-            originalSwitch(viewName, btn);
-            // Lógica visual móvil
-            document.querySelectorAll('.mob-item').forEach(b => b.classList.remove('active'));
-            // Buscamos el botón móvil correspondiente
-            const icons = {
-                'orders': 'receipt_long',
-                'inventory': 'inventory_2',
-                'featured': 'star',
-                'visitors': 'public',
-                'users': 'group'
-            };
-            const iconName = icons[viewName];
-            if(iconName) {
-                // Buscamos por icono para activar el botón correcto
-                const mobBtn = Array.from(document.querySelectorAll('.mob-item')).find(b => b.innerHTML.includes(iconName));
-                if(mobBtn) mobBtn.classList.add('active');
-            }
-        }
-    </script>
 
     <script src="manager.js"></script>
+
 </body>
 </html>

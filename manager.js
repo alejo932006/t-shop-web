@@ -39,27 +39,6 @@ function checkAuth() {
 }
 
 
-// --- NAVEGACIÓN ---
-function switchView(viewName, btn) {
-    if (!checkAuth()) return; // Protección
-
-    document.getElementById('view-orders').style.display = 'none';
-    document.getElementById('view-inventory').style.display = 'none';
-    document.getElementById('view-featured').style.display = 'none';
-    document.getElementById('view-users').style.display = 'none'; // Ocultar el nuevo también
-    
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    
-    const viewToShow = document.getElementById(`view-${viewName}`);
-    if (viewToShow) viewToShow.style.display = 'block';
-
-    if(viewName === 'orders') loadOrders();
-    if(viewName === 'inventory') loadInventory();
-    if(viewName === 'featured') loadFeaturedView();
-    if(viewName === 'users') loadUsers(); // <--- NUEVO
-}
-
 // ==========================================
 // MÓDULO DE PEDIDOS (LOGÍSTICA) - ACTUALIZADO
 // ==========================================
@@ -101,13 +80,13 @@ function renderOrdersList(listToRender = allOrders) {
     container.innerHTML = '';
 
     if(listToRender.length === 0) {
-        container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">No se encontraron pedidos en esta fecha.</div>';
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">No se encontraron pedidos.</div>';
         return;
     }
 
-    // Encabezado de la "Tabla"
+    // Encabezado usando CLASE, no style inline
     const header = document.createElement('div');
-    header.style.cssText = "display: grid; grid-template-columns: 0.5fr 1.5fr 1fr 1fr 1fr; padding: 10px; background: #333; font-weight: bold; border-radius: 8px 8px 0 0; color: #aaa; font-size: 0.9rem;";
+    header.className = 'table-header'; // <--- CLASE NUEVA
     header.innerHTML = `
         <span>ID</span>
         <span>Cliente</span>
@@ -117,23 +96,19 @@ function renderOrdersList(listToRender = allOrders) {
     `;
     container.appendChild(header);
 
-    // Filas (Usamos listToRender en lugar de allOrders)
     listToRender.forEach(o => {
         const div = document.createElement('div');
-        div.className = 'order-row';
-        div.style.cssText = "display: grid; grid-template-columns: 0.5fr 1.5fr 1fr 1fr 1fr; padding: 15px 10px; border-bottom: 1px solid #333; cursor: pointer; transition: background 0.2s; align-items: center;";
-        div.onmouseover = () => div.style.background = '#222';
-        div.onmouseout = () => div.style.background = 'transparent';
+        div.className = 'table-row'; // <--- CLASE NUEVA (reemplaza order-row con estilos fijos)
         div.onclick = () => openOrderDetails(o.id);
 
         const statusColor = o.estado === 'PENDIENTE' ? '#FFC107' : '#00C853';
 
         div.innerHTML = `
-            <span style="color: var(--accent); font-weight:bold;">#${o.id}</span>
-            <span>${o.cliente_nombre}</span>
-            <span style="font-size: 0.85rem; color: #888;">${new Date(o.fecha_pedido).toLocaleDateString()}</span>
-            <span style="color: ${statusColor}; font-size: 0.8rem; font-weight: bold; border: 1px solid ${statusColor}; padding: 2px 6px; border-radius: 4px; display: inline-block; text-align: center; width: fit-content;">${o.estado}</span>
-            <span style="text-align:right; font-weight:bold;">$${Number(o.total_venta).toLocaleString()}</span>
+            <span class="cell-id">#${o.id}</span>
+            <span class="cell-client">${o.cliente_nombre}</span>
+            <span class="cell-date">${new Date(o.fecha_pedido).toLocaleDateString()}</span>
+            <span class="cell-status" style="color: ${statusColor}; border-color: ${statusColor};">${o.estado}</span>
+            <span class="cell-total">$${Number(o.total_venta).toLocaleString()}</span>
         `;
         container.appendChild(div);
     });
@@ -718,38 +693,62 @@ async function deleteUser(id) {
     } catch(e) { alert("Error al eliminar"); }
 }
 
-
-// --- AGREGAR EN manager.js ---
-
-// 1. Modificar switchView para incluir el nuevo caso 'visitors'
+// --- NAVEGACIÓN UNIFICADA ---
 function switchView(viewName, btn) {
     if (!checkAuth()) return;
 
-    // Ocultar todas las vistas existentes
-    document.getElementById('view-orders').style.display = 'none';
-    document.getElementById('view-inventory').style.display = 'none';
-    document.getElementById('view-featured').style.display = 'none';
-    document.getElementById('view-users').style.display = 'none';
+    // 1. Ocultar todas las vistas
+    const views = ['orders', 'inventory', 'featured', 'users', 'visitors'];
+    views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if(el) el.style.display = 'none';
+    });
     
-    // --- NUEVO ---
-    document.getElementById('view-visitors').style.display = 'none'; 
-    // -------------
-
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    
+    // 2. Mostrar la vista seleccionada
     const viewToShow = document.getElementById(`view-${viewName}`);
     if (viewToShow) viewToShow.style.display = 'block';
 
+    // 3. GESTIÓN DE BOTONES (PC y MÓVIL)
+    // Primero: Quitamos 'active' de TODOS los botones (PC y Móvil)
+    document.querySelectorAll('.nav-item, .mob-item').forEach(b => b.classList.remove('active'));
+
+    // Segundo: Si el click vino de un botón, lo activamos
+    if(btn) {
+        btn.classList.add('active');
+    } else {
+        // Si la función se llamó sin botón (ej: al cargar), buscamos qué botón corresponde a esta vista
+        // Mapeo de vista -> icono para encontrar el botón móvil correcto
+        const icons = {
+            'orders': 'receipt_long',
+            'inventory': 'inventory_2',
+            'featured': 'star',
+            'users': 'group',
+            'visitors': 'public'
+        };
+        
+        // Activar en Sidebar PC
+        const pcBtns = document.querySelectorAll(`.nav-item`);
+        pcBtns.forEach(b => { if(b.innerHTML.includes(icons[viewName])) b.classList.add('active'); });
+
+        // Activar en Móvil
+        const mobBtns = document.querySelectorAll(`.mob-item`);
+        mobBtns.forEach(b => { if(b.innerHTML.includes(icons[viewName])) b.classList.add('active'); });
+    }
+
+    // 4. Cargar datos
     if(viewName === 'orders') loadOrders();
     if(viewName === 'inventory') loadInventory();
     if(viewName === 'featured') loadFeaturedView();
     if(viewName === 'users') loadUsers();
-    
-    // --- NUEVO ---
     if(viewName === 'visitors') loadVisitors();
-    // -------------
 }
+
+// Función auxiliar para el menú "Más" en móvil
+function toggleMobMenu() {
+    const menu = document.getElementById('mob-menu-extra');
+    if(menu) menu.classList.toggle('hidden');
+}
+
 
 // 2. Nueva función para cargar visitantes
 async function loadVisitors() {
@@ -768,25 +767,27 @@ async function loadVisitors() {
             return;
         }
 
+        // Encabezado
+        const header = document.createElement('div');
+        header.className = 'table-header visitor-header';
+        header.innerHTML = `<span>IP</span><span>Visitas</span><span>Última</span><span>Disp.</span>`;
+        container.appendChild(header);
+
         data.forEach(v => {
             const div = document.createElement('div');
-            div.className = 'order-row'; // Reutilizamos estilo de filas
-            div.style.cssText = "display: grid; grid-template-columns: 1.5fr 1fr 1fr 2fr; padding: 15px 10px; border-bottom: 1px solid #333; align-items: center;";
+            div.className = 'table-row visitor-row';
             
-            // Formatear fecha
             const fecha = new Date(v.ultima_fecha).toLocaleString();
-            
-            // Simplificar User Agent (detectar si es móvil o pc visualmente)
             let icon = 'computer';
             if(v.dispositivo && v.dispositivo.toLowerCase().includes('mobile')) icon = 'smartphone';
 
             div.innerHTML = `
-                <span style="color: var(--accent); font-weight:bold;">${v.ip || 'Desconocida'}</span>
-                <span style="background:#333; padding:2px 8px; border-radius:10px; width:fit-content; font-size:0.8rem;">${v.conteo} veces</span>
+                <span style="color: var(--accent); font-weight:bold;">${v.ip || 'Unknown'}</span>
+                <span class="badge-count">${v.conteo}</span>
                 <span style="font-size: 0.85rem; color: #888;">${fecha}</span>
-                <div style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa;">
                     <span class="material-icons-round" style="font-size:16px;">${icon}</span>
-                    <span title="${v.dispositivo}">${v.dispositivo ? v.dispositivo.substring(0, 30)+'...' : 'N/A'}</span>
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.dispositivo ? v.dispositivo.substring(0, 15) : 'N/A'}</span>
                 </div>
             `;
             container.appendChild(div);
@@ -797,7 +798,6 @@ async function loadVisitors() {
         container.innerHTML = '<p>Error cargando visitantes.</p>';
     }
 }
-
 // ESTA ES LA FUNCIÓN QUE TE FALTA
 async function clearVisitors() {
     if(!confirm("⚠️ ¿Estás SEGURO de vaciar todo el registro de IPs?\nEsta acción no se puede deshacer.")) {
