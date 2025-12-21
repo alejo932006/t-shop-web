@@ -399,7 +399,6 @@ async function uploadPhoto() {
     const fileInput = document.getElementById('file-input');
     const file = fileInput.files[0];
     
-    // Obtener la orientación seleccionada
     let orientation = 'vertical';
     const radio = document.querySelector('input[name="img-orient"]:checked');
     if(radio) orientation = radio.value;
@@ -408,15 +407,15 @@ async function uploadPhoto() {
     
     const btn = document.querySelector('.actions button.primary');
     const originalText = btn.innerText;
-    btn.innerText = 'Mejorando foto...'; // Feedback visual
+    
+    // Cambio de texto para reflejar lo que hacemos
+    btn.innerText = 'Optimizando tamaño...'; 
     btn.disabled = true;
 
-    // --- AQUÍ LLAMAMOS A LA NUEVA FUNCIÓN ---
     processImage(file, async function(processedBlob) {
-        // Ahora 'processedBlob' es la foto mejorada y ligera
-        
         const formData = new FormData();
-        formData.append('image', processedBlob, "foto-optimizada.jpg"); // Le ponemos nombre nuevo
+        // Usamos la imagen procesada (solo redimensionada)
+        formData.append('image', processedBlob, "foto-web.jpg"); 
         formData.append('productId', currentEditId);
         formData.append('orientation', orientation);
         
@@ -426,19 +425,17 @@ async function uploadPhoto() {
             const token = localStorage.getItem('manager_token');
             const res = await fetch(`${API_URL}/manager/upload-image`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}` 
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
             });
             
             if(res.ok) {
                 closeModal();
-                loadInventory(); // Recargar grilla
-                alert("¡Foto mejorada y subida con éxito!");
+                loadInventory();
+                alert("Foto subida correctamente.");
             } else {
                 const errorMsg = await res.text();
-                alert("Error del servidor: " + errorMsg);
+                alert("Error: " + errorMsg);
             }
         } catch(e) {
             console.error(e);
@@ -871,18 +868,12 @@ async function deleteCurrentPhoto() {
     }
 }
 
-// --- PROCESAMIENTO DE IMAGEN (Filtro Pro + Compresión) ---
+// --- PROCESAMIENTO DE IMAGEN (Solo Compresión, sin filtros) ---
 function processImage(file, callback) {
-    // 1. Configuración del "Filtro Profesional"
-    const MAX_WIDTH = 1000; // Reducir a 1000px de ancho (estándar e-commerce ligero)
-    const QUALITY = 0.8;    // Calidad JPG al 80% (imperceptible al ojo, ahorra 50% espacio)
+    // 1. Configuración solo de tamaño
+    const MAX_WIDTH = 1000; // Mantenemos 1000px para que sean ligeras
+    const QUALITY = 0.8;    // Calidad 80% (invisible al ojo, pero baja mucho el peso)
     
-    // Filtros: Aumentamos un poco el contraste y la saturación para que el producto "resalte"
-    // Brightness: 1.05 (5% más luz)
-    // Contrast: 1.10 (10% más contraste)
-    // Saturate: 1.10 (10% más color)
-    const FILTER_SETTINGS = "brightness(1.05) contrast(1.10) saturate(1.10)";
-
     const reader = new FileReader();
     reader.readAsDataURL(file);
     
@@ -891,7 +882,7 @@ function processImage(file, callback) {
         img.src = event.target.result;
         
         img.onload = function() {
-            // 2. Calcular nuevas dimensiones (manteniendo proporción)
+            // 2. Calcular nuevas dimensiones
             let width = img.width;
             let height = img.height;
             
@@ -900,22 +891,18 @@ function processImage(file, callback) {
                 width = MAX_WIDTH;
             }
 
-            // 3. Crear el lienzo (Canvas) para dibujar la nueva foto
+            // 3. Crear el lienzo
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
 
-            // 4. APLICAR EL FILTRO PROFESIONAL
-            // Esta propiedad es mágica: aplica efectos tipo Instagram antes de dibujar
-            ctx.filter = FILTER_SETTINGS;
-
-            // 5. Dibujar la imagen redimensionada y filtrada
+            // 4. Dibujar la imagen TAL CUAL (Sin filtros de color)
             ctx.drawImage(img, 0, 0, width, height);
 
-            // 6. Exportar como archivo ligero (JPG comprimido)
+            // 5. Exportar optimizada
             canvas.toBlob(function(blob) {
-                callback(blob); // Devolvemos la foto ya procesada
+                callback(blob);
             }, 'image/jpeg', QUALITY);
         };
     };
