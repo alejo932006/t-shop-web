@@ -220,3 +220,157 @@ button.primary { background: var(--accent); color: white; border: none; padding:
     min-width: 20px;
     text-align: center;
 }
+
+/* =========================================
+   ESTILOS MÓVILES (APP MODE)
+   ========================================= */
+
+/* Ocultar navegación móvil por defecto en PC */
+.mobile-nav, .mob-menu-overlay { display: none; }
+
+@media (max-width: 768px) {
+    /* 1. ESTRUCTURA GENERAL */
+    body { flex-direction: column; overflow: hidden; }
+    .sidebar { display: none; } /* Adiós sidebar lateral */
+    
+    .content {
+        padding: 15px;
+        padding-bottom: 90px; /* Espacio para el menú inferior */
+        width: 100%;
+    }
+
+    /* 2. BARRA DE NAVEGACIÓN INFERIOR (Estilo App) */
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        border-top: 1px solid #333;
+        justify-content: space-around;
+        padding: 10px 0;
+        z-index: 1000;
+        padding-bottom: max(10px, env(safe-area-inset-bottom)); /* Para iPhones nuevos */
+    }
+
+    .mob-item {
+        background: none;
+        border: none;
+        color: #666;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+    }
+    
+    .mob-item .material-icons-round { font-size: 24px; }
+    
+    .mob-item.active {
+        color: var(--accent);
+    }
+
+    /* 3. ADAPTACIÓN DE TABLAS (Convertir filas en tarjetas) */
+    /* Pedidos y Visitantes */
+    .order-row {
+        grid-template-columns: 1fr auto !important; /* Solo ID y Estado/Total */
+        grid-template-areas: 
+            "id status"
+            "client total";
+        gap: 5px;
+        background: #1a1a1a;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid #333;
+    }
+
+    /* Ocultar columnas menos importantes en la vista rápida */
+    .order-row span:nth-child(3) { display: none; } /* Fecha */
+    
+    /* Reorganizar elementos internos de la fila */
+    .order-row span:nth-child(1) { grid-area: id; font-size: 1.1rem; }
+    .order-row span:nth-child(2) { grid-area: client; font-size: 0.9rem; color: #ccc; }
+    .order-row span:nth-child(4) { grid-area: status; text-align: right; }
+    .order-row span:nth-child(5) { grid-area: total; text-align: right; }
+
+    /* Visitantes adaptación */
+    #visitors-list .order-row {
+        grid-template-columns: 1fr !important;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* 4. INVENTARIO (2 Columnas para aprovechar espacio) */
+    .grid-container {
+        grid-template-columns: 1fr 1fr; /* Dos columnas */
+        gap: 10px;
+    }
+
+    .prod-card .prod-img { height: 120px; }
+    .prod-body { padding: 10px; }
+    .prod-title { font-size: 0.9rem; }
+    
+    /* Ajustar inputs de precio/stock para que quepan */
+    .input-row { 
+        grid-template-columns: 1fr; /* Uno debajo del otro en edición */
+        gap: 10px; 
+    }
+
+    /* 5. MODALES FULL SCREEN EN MÓVIL */
+    .modal-content {
+        width: 100% !important;
+        height: 100%;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column; /* <--- ASÍ ES LO CORRECTO */
+        overflow-y: auto;
+    }
+    
+    /* 6. CABECERAS Y KPI */
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .kpi-row {
+        overflow-x: auto; /* Scroll horizontal si no caben */
+        padding-bottom: 10px;
+    }
+    
+    .search-box { width: 100%; }
+    
+    /* Ocultar cabeceras de tabla que no sirven en móvil */
+    .list-container > div:first-child { display: none; } /* El header de la tabla */
+    
+    /* Menú Extra Flotante */
+    .mob-menu-overlay {
+        position: fixed;
+        bottom: 70px;
+        right: 10px;
+        z-index: 1001;
+    }
+    .mob-menu-content {
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        width: 150px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .mob-menu-content button {
+        background: none;
+        border: none;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        display: flex;
+        gap: 10px;
+        border-bottom: 1px solid #333;
+    }
+}

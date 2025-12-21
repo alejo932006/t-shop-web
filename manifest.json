@@ -1,0 +1,20 @@
+{
+    "name": "T-Shop Manager",
+    "short_name": "TS Manager",
+    "start_url": "./manager.html",
+    "display": "standalone",
+    "background_color": "#121212",
+    "theme_color": "#f97316",
+    "icons": [
+      {
+        "src": "logo.jpg",
+        "sizes": "192x192",
+        "type": "image/jpeg"
+      },
+      {
+        "src": "logo.jpg",
+        "sizes": "512x512",
+        "type": "image/jpeg"
+      }
+    ]
+  }

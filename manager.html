@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="manager.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f97316">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
 
@@ -286,6 +289,68 @@
             </div>
         </div>
     </div>
+    <div class="mobile-nav">
+        <button class="mob-item active" onclick="switchView('orders', this)">
+            <span class="material-icons-round">receipt_long</span>
+            <span class="lbl">Pedidos</span>
+        </button>
+        <button class="mob-item" onclick="switchView('inventory', this)">
+            <span class="material-icons-round">inventory_2</span>
+            <span class="lbl">Inv.</span>
+        </button>
+        <button class="mob-item" onclick="switchView('featured', this)">
+            <span class="material-icons-round">star</span>
+            <span class="lbl">Dest.</span>
+        </button>
+        <button class="mob-item" onclick="switchView('visitors', this)">
+            <span class="material-icons-round">public</span>
+            <span class="lbl">Visitas</span>
+        </button>
+        <button class="mob-item" onclick="toggleMobMenu()">
+            <span class="material-icons-round">menu</span>
+            <span class="lbl">Más</span>
+        </button>
+    </div>
+    
+    <div id="mob-menu-extra" class="mob-menu-overlay hidden" onclick="toggleMobMenu()">
+        <div class="mob-menu-content">
+            <button onclick="switchView('users'); toggleMobMenu()">
+                <span class="material-icons-round">group</span> Usuarios
+            </button>
+            <button onclick="window.location.reload()" style="color: var(--danger);">
+                <span class="material-icons-round">logout</span> Salir
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Pequeño script para abrir el menú extra
+        function toggleMobMenu() {
+            document.getElementById('mob-menu-extra').classList.toggle('hidden');
+        }
+    
+        // Modificar switchView para que también active los botones móviles
+        const originalSwitch = switchView;
+        switchView = function(viewName, btn) {
+            originalSwitch(viewName, btn);
+            // Lógica visual móvil
+            document.querySelectorAll('.mob-item').forEach(b => b.classList.remove('active'));
+            // Buscamos el botón móvil correspondiente
+            const icons = {
+                'orders': 'receipt_long',
+                'inventory': 'inventory_2',
+                'featured': 'star',
+                'visitors': 'public',
+                'users': 'group'
+            };
+            const iconName = icons[viewName];
+            if(iconName) {
+                // Buscamos por icono para activar el botón correcto
+                const mobBtn = Array.from(document.querySelectorAll('.mob-item')).find(b => b.innerHTML.includes(iconName));
+                if(mobBtn) mobBtn.classList.add('active');
+            }
+        }
+    </script>
 
     <script src="manager.js"></script>
 </body>
