@@ -38,6 +38,10 @@
         <button class="nav-item" onclick="switchView('users', this)">
             <span class="material-icons-round">group</span> Usuarios
         </button>
+
+        <button class="nav-item" onclick="switchView('visitors', this)">
+            <span class="material-icons-round">public</span> Visitantes
+        </button>
         
         <button class="nav-item logout" onclick="window.location.reload()">
             <span class="material-icons-round">logout</span> Salir
@@ -156,6 +160,26 @@
                     <div id="users-list" class="list-container">
                         </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="view-visitors" style="display: none;">
+            <header class="header">
+                <h1>Registro de IPs</h1>
+                <button class="btn-refresh" onclick="loadVisitors()">
+                    <span class="material-icons-round">refresh</span>
+                </button>
+            </header>
+        
+            <div class="list-container">
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 2fr; padding: 10px; background: #333; font-weight: bold; border-radius: 8px 8px 0 0; color: #aaa; font-size: 0.9rem;">
+                    <span>IP</span>
+                    <span>Visitas</span>
+                    <span>Última Vez</span>
+                    <span>Dispositivo</span>
+                </div>
+                
+                <div id="visitors-list"></div>
             </div>
         </section>
 

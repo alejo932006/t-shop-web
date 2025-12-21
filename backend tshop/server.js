@@ -83,9 +83,26 @@ const verifyToken = (req, res, next) => {
 // ==========================================
 // Estas NO llevan 'verifyToken' porque cualquiera puede comprar
 
-app.get('/api/products', async (req, res) => {
+// --- 1. AGREGA ESTA FUNCIÓN AUXILIAR (Puede ir antes de las rutas) ---
+const registrarVisita = async (req) => {
     try {
-      const result = await pool.query('SELECT *, es_destacado FROM productos ORDER BY nombre');
+        // Intenta obtener la IP real (incluso si estás detrás de proxies)
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        const dispositivo = req.headers['user-agent']; // Navegador/Celular usado
+        
+        // Guardamos en BD (sin await para no frenar la carga del producto)
+        pool.query('INSERT INTO visitas (ip, dispositivo) VALUES ($1, $2)', [ip, dispositivo]);
+    } catch (err) {
+        console.error("Error registrando visita:", err.message);
+    }
+};
+
+app.get('/api/products', async (req, res) => {
+    registrarVisita(req);
+    try {
+      // MODIFICACIÓN: Agregamos WHERE estado = 'Activo'
+      const result = await pool.query("SELECT *, es_destacado FROM productos WHERE estado = 'Activo' ORDER BY nombre");
+      
       const productos = result.rows.map(p => ({
           id: p.codigo,
           nombre: p.nombre,
@@ -214,6 +231,29 @@ app.patch('/api/manager/description/:id', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).send(err.message); }
 });
 
+app.get('/api/manager/products-all', verifyToken, async (req, res) => {
+    try {
+      // Aquí NO filtramos por estado, para que tú veas todo el inventario
+      const result = await pool.query("SELECT *, es_destacado FROM productos WHERE estado = 'Activo' ORDER BY nombre");
+      
+      // Mapeamos igual que antes para mantener compatibilidad con tu manager.js
+      const productos = result.rows.map(p => ({
+          id: p.codigo,
+          nombre: p.nombre,
+          precio: p.precio_venta,
+          cantidad: p.cantidad,
+          unidad: p.unidad_medida,
+          linea: p.area_encargada,
+          descripcion: p.descripcion,
+          orientacion: p.imagen_orientacion || 'vertical',
+          imagen_url: p.imagen_url ? `https://api.tshoptechnology.com${p.imagen_url}` : null,
+          destacado: p.es_destacado,
+          estado: p.estado // Incluimos el estado para que lo veas en el manager si quieres
+      }));
+      res.json(productos);
+    } catch (err) { res.status(500).send(err.message); }
+});
+
 // --- GESTIÓN DE USUARIOS (PROTEGIDAS) ---
 
 app.get('/api/manager/users', verifyToken, async (req, res) => {
@@ -238,6 +278,21 @@ app.delete('/api/manager/users/:id', verifyToken, async (req, res) => {
     try {
         await pool.query('DELETE FROM usuariosmanager WHERE id = $1', [id]);
         res.json({ success: true });
+    } catch (err) { res.status(500).send(err.message); }
+});
+
+app.get('/api/manager/visitors', verifyToken, async (req, res) => {
+    try {
+        // Agrupamos por IP para no repetir, mostrando la última visita
+        const query = `
+            SELECT ip, COUNT(*) as conteo, MAX(fecha) as ultima_fecha, MAX(dispositivo) as dispositivo 
+            FROM visitas 
+            GROUP BY ip 
+            ORDER BY ultima_fecha DESC 
+            LIMIT 50
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
     } catch (err) { res.status(500).send(err.message); }
 });
 

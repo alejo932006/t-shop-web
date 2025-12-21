@@ -718,4 +718,84 @@ async function deleteUser(id) {
     } catch(e) { alert("Error al eliminar"); }
 }
 
+
+// --- AGREGAR EN manager.js ---
+
+// 1. Modificar switchView para incluir el nuevo caso 'visitors'
+function switchView(viewName, btn) {
+    if (!checkAuth()) return;
+
+    // Ocultar todas las vistas existentes
+    document.getElementById('view-orders').style.display = 'none';
+    document.getElementById('view-inventory').style.display = 'none';
+    document.getElementById('view-featured').style.display = 'none';
+    document.getElementById('view-users').style.display = 'none';
+    
+    // --- NUEVO ---
+    document.getElementById('view-visitors').style.display = 'none'; 
+    // -------------
+
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    
+    const viewToShow = document.getElementById(`view-${viewName}`);
+    if (viewToShow) viewToShow.style.display = 'block';
+
+    if(viewName === 'orders') loadOrders();
+    if(viewName === 'inventory') loadInventory();
+    if(viewName === 'featured') loadFeaturedView();
+    if(viewName === 'users') loadUsers();
+    
+    // --- NUEVO ---
+    if(viewName === 'visitors') loadVisitors();
+    // -------------
+}
+
+// 2. Nueva función para cargar visitantes
+async function loadVisitors() {
+    const container = document.getElementById('visitors-list');
+    container.innerHTML = '<p class="loading">Rastreando IPs...</p>';
+
+    try {
+        const res = await authFetch('/manager/visitors');
+        if(!res) return;
+        const data = await res.json();
+
+        container.innerHTML = '';
+        
+        if(data.length === 0) {
+            container.innerHTML = '<div style="padding:20px; text-align:center;">No hay registros aún.</div>';
+            return;
+        }
+
+        data.forEach(v => {
+            const div = document.createElement('div');
+            div.className = 'order-row'; // Reutilizamos estilo de filas
+            div.style.cssText = "display: grid; grid-template-columns: 1.5fr 1fr 1fr 2fr; padding: 15px 10px; border-bottom: 1px solid #333; align-items: center;";
+            
+            // Formatear fecha
+            const fecha = new Date(v.ultima_fecha).toLocaleString();
+            
+            // Simplificar User Agent (detectar si es móvil o pc visualmente)
+            let icon = 'computer';
+            if(v.dispositivo && v.dispositivo.toLowerCase().includes('mobile')) icon = 'smartphone';
+
+            div.innerHTML = `
+                <span style="color: var(--accent); font-weight:bold;">${v.ip || 'Desconocida'}</span>
+                <span style="background:#333; padding:2px 8px; border-radius:10px; width:fit-content; font-size:0.8rem;">${v.conteo} veces</span>
+                <span style="font-size: 0.85rem; color: #888;">${fecha}</span>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                    <span class="material-icons-round" style="font-size:16px;">${icon}</span>
+                    <span title="${v.dispositivo}">${v.dispositivo ? v.dispositivo.substring(0, 30)+'...' : 'N/A'}</span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<p>Error cargando visitantes.</p>';
+    }
+}
+
 // loadOrders();
