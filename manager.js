@@ -3,6 +3,7 @@ let allProducts = [];
 let currentEditId = null;
 let isLoggedIn = false;
 
+
 async function authFetch(endpoint, options = {}) {
     const token = localStorage.getItem('manager_token');
     

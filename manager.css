@@ -1,3 +1,4 @@
+.hidden { display: none !important; }
 :root {
     --bg: #121212;
     --card: #1E1E1E;
@@ -399,6 +400,8 @@ button.primary { background: var(--accent); color: white; border: none; padding:
     
     /* Menú flotante */
     .mob-menu-overlay {
+        display: flex; /* <--- ESTA LÍNEA FALTABA */
+        flex-direction: column;
         position: fixed;
         bottom: 75px;
         right: 10px;
