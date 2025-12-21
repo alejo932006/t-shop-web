@@ -281,6 +281,18 @@ app.delete('/api/manager/users/:id', verifyToken, async (req, res) => {
     } catch (err) { res.status(500).send(err.message); }
 });
 
+app.delete('/api/manager/visitors', verifyToken, async (req, res) => {
+    try {
+        // "TRUNCATE" es más rápido que DELETE para vaciar tablas enteras
+        // RESTART IDENTITY reinicia el contador de IDs a 1
+        await pool.query('TRUNCATE TABLE visitas RESTART IDENTITY');
+        res.json({ success: true, message: "Historial eliminado correctamente" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Error al limpiar historial" });
+    }
+});
+
 app.get('/api/manager/visitors', verifyToken, async (req, res) => {
     try {
         // Agrupamos por IP para no repetir, mostrando la última visita

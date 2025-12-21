@@ -166,9 +166,16 @@
         <section id="view-visitors" style="display: none;">
             <header class="header">
                 <h1>Registro de IPs</h1>
-                <button class="btn-refresh" onclick="loadVisitors()">
-                    <span class="material-icons-round">refresh</span>
-                </button>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-refresh" onclick="clearVisitors()" style="background: var(--danger); color: white;" title="Borrar Historial">
+                        <span class="material-icons-round">delete_sweep</span>
+                    </button>
+            
+                    <button class="btn-refresh" onclick="loadVisitors()" title="Actualizar lista">
+                        <span class="material-icons-round">refresh</span>
+                    </button>
+                </div>
             </header>
         
             <div class="list-container">
