@@ -170,3 +170,53 @@ button.primary { background: var(--accent); color: white; border: none; padding:
     background: var(--success);
     border-color: var(--success);
 }
+
+/* En manager.css, al final */
+
+/* FILTROS DE FOTOS */
+.photo-filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-pill {
+    background: #333;
+    border: 1px solid #444;
+    color: #aaa;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.filter-pill:hover {
+    background: #444;
+    color: white;
+}
+
+.filter-pill.active {
+    background: var(--accent); /* Naranja */
+    border-color: var(--accent);
+    color: white;
+}
+
+/* Estilo especial para el botón "Sin Fotos" cuando está activo */
+.filter-pill.warning.active {
+    background: var(--danger); /* Rojo */
+    border-color: var(--danger);
+}
+
+.badge {
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    min-width: 20px;
+    text-align: center;
+}

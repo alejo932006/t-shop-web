@@ -88,12 +88,26 @@
 
         <!-- VISTA INVENTARIO -->
         <section id="view-inventory" style="display: none;">
-            <header class="header">
-                <h1>Inventario & Fotos</h1>
-                
-                <div class="search-box">
-                    <span class="material-icons-round">search</span>
-                    <input type="text" id="search-prod" placeholder="Buscar por nombre, código..." oninput="searchProducts(this.value)">
+            <header class="header" style="flex-direction: column; align-items: flex-start; gap: 15px;">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <h1>Inventario & Fotos</h1>
+                    
+                    <div class="search-box">
+                        <span class="material-icons-round">search</span>
+                        <input type="text" id="search-prod" placeholder="Buscar por nombre, código..." oninput="searchProducts(this.value)">
+                    </div>
+                </div>
+            
+                <div class="photo-filters">
+                    <button class="filter-pill active" onclick="filterPhotos('all', this)">
+                        Todos <span id="count-all" class="badge">0</span>
+                    </button>
+                    <button class="filter-pill" onclick="filterPhotos('with', this)">
+                        📸 Con Fotos <span id="count-with" class="badge">0</span>
+                    </button>
+                    <button class="filter-pill warning" onclick="filterPhotos('without', this)">
+                        ⚠️ Sin Fotos <span id="count-without" class="badge">0</span>
+                    </button>
                 </div>
             </header>
 

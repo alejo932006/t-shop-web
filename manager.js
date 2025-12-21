@@ -207,24 +207,66 @@ async function changeStatus(id, newStatus) {
 // ==========================================
 // MÓDULO DE INVENTARIO & FOTOS
 // ==========================================
+// En manager.js
+
+// 1. MODIFICA la función loadInventory existente para calcular los contadores
 async function loadInventory() {
     const container = document.getElementById('inventory-list');
     container.innerHTML = '<p class="loading">Cargando catálogo completo...</p>';
     
     try {
-        // CAMBIO IMPORTANTE:
-        // Antes usabas fetch normal a la ruta pública.
-        // Ahora usamos authFetch (tu función segura) a la nueva ruta privada del manager.
         const res = await authFetch('/manager/products-all');
         
         if (res) {
             allProducts = await res.json();
+            
+            // --- NUEVO: CALCULAR CONTADORES ---
+            updatePhotoCounters(); 
+            // ----------------------------------
+
             renderProducts(allProducts);
         }
     } catch(e) {
         console.error(e);
         container.innerHTML = '<p>Error al cargar productos.</p>';
     }
+}
+
+// 2. AGREGA estas nuevas funciones al final de tu archivo (o donde prefieras)
+
+function updatePhotoCounters() {
+    // Calculamos totales
+    const total = allProducts.length;
+    const withPhoto = allProducts.filter(p => p.imagen_url && p.imagen_url.trim() !== '').length;
+    const withoutPhoto = total - withPhoto;
+
+    // Actualizamos el HTML
+    document.getElementById('count-all').innerText = total;
+    document.getElementById('count-with').innerText = withPhoto;
+    document.getElementById('count-without').innerText = withoutPhoto;
+}
+
+function filterPhotos(mode, btn) {
+    // 1. Gestión visual de botones activos
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+
+    // 2. Lógica de filtrado
+    let filteredList = [];
+
+    if (mode === 'all') {
+        filteredList = allProducts;
+    } else if (mode === 'with') {
+        filteredList = allProducts.filter(p => p.imagen_url && p.imagen_url.trim() !== '');
+    } else if (mode === 'without') {
+        filteredList = allProducts.filter(p => !p.imagen_url || p.imagen_url.trim() === '');
+    }
+
+    // 3. Renderizamos la lista filtrada
+    renderProducts(filteredList);
+
+    // 4. Limpiamos el buscador de texto para evitar confusión
+    document.getElementById('search-prod').value = '';
 }
 
 function renderProducts(list) {
