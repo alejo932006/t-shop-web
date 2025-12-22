@@ -46,7 +46,7 @@
             <span class="material-icons-round">public</span> Visitantes
         </button>
         
-        <button class="nav-item logout" onclick="window.location.reload()">
+        <button class="nav-item logout" onclick="doLogout()">
             <span class="material-icons-round">logout</span> Salir
         </button>
     </nav>
@@ -317,7 +317,7 @@
             <button onclick="switchView('users'); toggleMobMenu()">
                 <span class="material-icons-round">group</span> Usuarios
             </button>
-            <button onclick="window.location.reload()" style="color: var(--danger);">
+            <button onclick="doLogout()" style="color: var(--danger);">
                 <span class="material-icons-round">logout</span> Salir
             </button>
         </div>
