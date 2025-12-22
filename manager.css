@@ -596,3 +596,59 @@ button.primary { background: var(--accent); color: white; border: none; padding:
     width: 350px !important;      /* En PC se queda en 350px */
     max-width: 90vw !important;   /* En celulares muy pequeños se ajusta al 90% */
 }
+
+/* --- CORRECCIÓN FINAL: Tabla de Visitantes en Móvil --- */
+
+@media (max-width: 768px) {
+    
+    /* 1. Ocultar el encabezado de la tabla a la fuerza */
+    .visitor-header {
+        display: none !important;
+    }
+
+    /* 2. Rediseñar la tarjeta de visitante */
+    .visitor-row {
+        display: grid !important;
+        grid-template-columns: 1fr auto; /* Izquierda: Info, Derecha: Contador */
+        gap: 5px;
+        align-items: center;
+        padding: 15px !important;
+    }
+
+    /* A. La IP (Más grande) */
+    .visitor-row span:nth-child(1) {
+        font-size: 1.1rem !important;
+        grid-column: 1 / 2; /* Columna 1 */
+        margin-bottom: 2px;
+    }
+
+    /* B. El contador (Badge rojo/gris a la derecha) */
+    .visitor-row .badge-count {
+        grid-column: 2 / 3; /* Columna 2 (Derecha) */
+        grid-row: 1 / 2;    /* Fila 1 (Arriba) */
+        font-size: 0.9rem;
+        background: #333;
+        padding: 5px 10px;
+        border-radius: 8px;
+        justify-self: end;  /* Alinear al final */
+    }
+
+    /* C. La Fecha (Debajo de la IP) */
+    .visitor-row span:nth-child(3) {
+        grid-column: 1 / 3; /* Ocupa todo el ancho */
+        font-size: 0.75rem !important;
+        color: #666 !important;
+    }
+
+    /* D. El Dispositivo (Abajo del todo con línea separadora) */
+    .visitor-row div:last-child {
+        grid-column: 1 / 3;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #333; /* Línea sutil */
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+}

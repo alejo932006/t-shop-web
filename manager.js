@@ -449,12 +449,27 @@ async function uploadPhoto() {
 
 // --- LÓGICA DE DESTACADOS ---
 
-function loadFeaturedView() {
-    // Reutilizamos allProducts que ya cargó en loadInventory, o los cargamos si está vacío
-    if(allProducts.length === 0) fetch('http://localhost:3000/api/products').then(r=>r.json()).then(d=>{allProducts=d; renderFeaturedUI();});
-    else renderFeaturedUI();
+async function loadFeaturedView() {
+    // Reutilizamos allProducts si ya existe
+    if(allProducts.length === 0) {
+        // Si está vacío, cargamos usando la conexión segura y la URL correcta
+        try {
+            const res = await authFetch('/manager/products-all');
+            if(res) {
+                allProducts = await res.json();
+                // Opcional: Actualizamos contadores si queremos mantener sincronía
+                updatePhotoCounters(); 
+                renderFeaturedUI();
+            }
+        } catch(e) {
+            console.error("Error cargando productos en destacados:", e);
+            document.getElementById('featured-active-list').innerHTML = '<p>Error de conexión.</p>';
+        }
+    } else {
+        // Si ya estaban cargados, solo pintamos la interfaz
+        renderFeaturedUI();
+    }
 }
-
 function renderFeaturedUI() {
     const activeContainer = document.getElementById('featured-active-list');
     
