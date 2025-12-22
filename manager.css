@@ -544,20 +544,50 @@ button.primary { background: var(--accent); color: white; border: none; padding:
     }
 }
 
-/* Corrección para centrar los inputs */
-.input-icon-group input {
+/* --- ESTILOS LOGIN DEFINITIVOS --- */
+
+.input-icon-group {
+    position: relative;
     width: 100%;
+    margin-bottom: 15px;
+    box-sizing: border-box; /* Asegura que el contenedor respete medidas */
+}
+
+.input-icon-group input {
+    width: 100% !important; /* Fuerza el ancho exacto */
+    height: 50px; /* Altura fija para uniformidad */
     background: #252525 !important;
     border: 1px solid #444 !important;
+    border-radius: 12px !important;
     
-    /* Esta es la línea clave que faltaba: */
+    /* EL TRUCO: Box-sizing y Padding */
     box-sizing: border-box !important; 
+    padding: 0 15px 0 50px !important; /* 50px a la izquierda para el icono */
     
-    padding: 15px 15px 15px 45px !important; /* Espacio para el icono */
     font-size: 1rem !important;
     color: white !important;
-    border-radius: 12px !important;
     outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    margin: 0 !important; /* Aseguramos que no tenga márgenes extraños */
+    transition: all 0.3s ease;
+}
+
+/* Estilo del Icono */
+.input-icon-group .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%); /* Centrado vertical matemático */
+    font-size: 24px;
+    color: #888;
+    z-index: 10; /* ¡IMPORTANTE! Esto pone el icono encima del input */
+    pointer-events: none; /* Permite hacer clic en el input a través del icono */
+}
+
+/* Efectos al seleccionar */
+.input-icon-group input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+
+.input-icon-group input:focus + .icon {
+    color: var(--accent); /* El icono se pone naranja al escribir */
 }
