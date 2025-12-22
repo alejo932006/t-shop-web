@@ -114,12 +114,14 @@ function renderOrdersList(listToRender = allOrders) {
     });
 }
 
-function openOrderDetails(id) {
+/* --- BUSCA openOrderDetails Y ACTUALIZA SU CONTENIDO --- */
+
+async function openOrderDetails(id) {
     // Buscar el pedido en memoria
     const o = allOrders.find(order => String(order.id) === String(id));
     if(!o) return;
 
-    // 1. Llenar datos básicos
+    // 1. Llenar datos básicos (Igual que antes)
     document.getElementById('detail-id').innerText = o.id;
     document.getElementById('detail-client').innerText = o.cliente_nombre;
     document.getElementById('detail-cedula').innerText = `CC: ${o.cliente_cedula || '---'}`;
@@ -130,12 +132,75 @@ function openOrderDetails(id) {
     document.getElementById('detail-date').innerText = new Date(o.fecha_pedido).toLocaleString();
     document.getElementById('detail-total').innerText = `$${Number(o.total_venta).toLocaleString()}`;
 
-    // 2. Configurar Botón WhatsApp
+    // 2. --- NUEVO: ANÁLISIS DE SEGURIDAD (FRAUDE) ---
+    const securityBox = document.getElementById('security-analysis');
+    
+    // Limpiamos estado anterior
+    if(securityBox) {
+        securityBox.innerHTML = '<span class="loading-text">Analizando ubicación... 🕵️</span>';
+        securityBox.className = 'security-box'; // Clase base
+    }
+
+    if (o.ip_pedido) {
+        try {
+            // Usamos una API gratuita que soporta HTTPS (ipwho.is)
+            const geoRes = await fetch(`https://ipwho.is/${o.ip_pedido}`);
+            const geo = await geoRes.json();
+
+            if (geo.success) {
+                // Comparación simple (convertimos a minúsculas para evitar errores por mayúsculas)
+                const cityOrder = o.cliente_ciudad.toLowerCase();
+                const cityIp = geo.city.toLowerCase();
+                const regionIp = geo.region.toLowerCase();
+
+                // ¿Coincide la ciudad o la región?
+                const match = cityOrder.includes(cityIp) || cityIp.includes(cityOrder) || 
+                              o.cliente_departamento.toLowerCase().includes(regionIp);
+
+                if (match) {
+                    // TODO OK
+                    securityBox.innerHTML = `
+                        <div style="color: #00C853; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                            <span class="material-icons-round">verified_user</span> COMPRA SEGURA
+                        </div>
+                        <div style="font-size: 0.85rem; color: #aaa;">IP (${o.ip_pedido}) ubicada en <strong>${geo.city}, ${geo.region}</strong>. Coincide con el envío.</div>
+                    `;
+                    securityBox.style.borderColor = '#00C853';
+                    securityBox.style.background = 'rgba(0, 200, 83, 0.1)';
+                } else {
+                    // ALERTA DE FRAUDE
+                    securityBox.innerHTML = `
+                        <div style="color: #FF5252; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                            <span class="material-icons-round">warning</span> POSIBLE ALERTA
+                        </div>
+                        <div style="font-size: 0.85rem; color: #ccc;">
+                            El cliente dice estar en <strong>${o.cliente_ciudad}</strong>, <br>
+                            pero su conexión viene de <strong>${geo.city}, ${geo.region}</strong>.
+                        </div>
+                    `;
+                    securityBox.style.borderColor = '#FF5252';
+                    securityBox.style.background = 'rgba(255, 82, 82, 0.1)';
+                }
+            } else {
+                securityBox.innerHTML = `<span style="color:#aaa">No se pudo localizar la IP (${o.ip_pedido})</span>`;
+            }
+        } catch (e) {
+            console.error(e);
+            securityBox.innerHTML = `<span style="color:#aaa">Error conectando con servicio de geo.</span>`;
+        }
+    } else {
+        // Pedidos antiguos sin IP
+        if(securityBox) securityBox.innerHTML = `<span style="color:#666; font-style:italic;">Pedido antiguo (Sin registro de IP)</span>`;
+    }
+    // ----------------------------------------------------
+
+
+    // 3. Botón WhatsApp (Igual que antes)
     const msg = `Hola ${o.cliente_nombre}, te escribo de T-Shop respecto a tu pedido #${o.id}.`;
     const waUrl = `https://wa.me/57${o.cliente_telefono}?text=${encodeURIComponent(msg)}`;
     document.getElementById('btn-whatsapp').href = waUrl;
 
-    // 3. Llenar lista de productos
+    // 4. Llenar lista de productos (Igual que antes)
     const prodsContainer = document.getElementById('detail-products');
     try {
         const items = JSON.parse(o.detalle_productos);
@@ -147,7 +212,7 @@ function openOrderDetails(id) {
         `).join('');
     } catch(e) { prodsContainer.innerHTML = 'Error mostrando productos'; }
 
-    // 4. Botón de Acción (Despachar)
+    // 5. Botón de Acción (Igual que antes)
     const actionsContainer = document.getElementById('detail-actions');
     if(o.estado === 'PENDIENTE') {
         actionsContainer.innerHTML = `<button onclick="changeStatus(${o.id}, 'DESPACHADO')" class="primary" style="background:var(--success);">✅ Marcar Despachado</button>`;
