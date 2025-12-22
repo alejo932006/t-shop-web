@@ -147,12 +147,12 @@ window.loadMoreProducts = () => {
     nextBatch.forEach(p => {
         const precio = formatCurrency(p.precio);
         let imgClass = p.orientacion === 'horizontal' 
-            ? "h-56 w-full object-cover group-hover:scale-105 transition duration-500" 
-            : "h-56 w-full object-contain p-4 group-hover:scale-105 transition duration-500 mix-blend-multiply";
-        
+        ? "h-36 md:h-56 w-full object-cover group-hover:scale-105 transition duration-500" 
+        : "h-36 md:h-56 w-full object-contain p-2 md:p-4 group-hover:scale-105 transition duration-500 mix-blend-multiply";
+    
         let containerClass = p.orientacion === 'horizontal'
-            ? "h-56 w-full overflow-hidden bg-gray-100"
-            : "h-56 w-full bg-white flex items-center justify-center";
+            ? "h-36 md:h-56 w-full overflow-hidden bg-gray-100"
+            : "h-36 md:h-56 w-full bg-white flex items-center justify-center";
 
             const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`;
 
@@ -173,20 +173,25 @@ window.loadMoreProducts = () => {
 
         card.innerHTML = `
             ${imgContent}
-            <div class="p-5 flex flex-col flex-grow">
-                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider flex justify-between">
-                    <span>${p.linea || 'General'}</span>
-                    ${p.cantidad < 5 ? `<span class="text-red-500">¡Últimas ud!</span>` : ''}
+            
+            <div class="p-3 md:p-5 flex flex-col flex-grow">
+                
+                <div class="text-[9px] md:text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider flex justify-between">
+                    <span class="truncate mr-1">${p.linea || 'General'}</span>
+                    ${p.cantidad < 5 ? `<span class="text-red-500 whitespace-nowrap">¡Pocos!</span>` : ''}
                 </div>
-                <h4 class="font-bold text-gray-900 text-lg leading-tight mb-2 line-clamp-2" title="${p.nombre}">${p.nombre}</h4>
-                <div class="mt-auto flex items-center justify-between pt-2">
-                    <div>
-                        <span class="block text-xl font-black text-gray-900">${precio}</span>
-                        <span class="text-xs text-gray-400 font-medium">Disp: ${p.cantidad} ${p.unidad || 'Un'}</span>
+
+                <h4 class="font-bold text-gray-900 text-sm md:text-lg leading-tight mb-2 line-clamp-2" title="${p.nombre}">${p.nombre}</h4>
+                
+                <div class="mt-auto flex items-end justify-between pt-2 gap-1">
+                    <div class="flex flex-col">
+                        <span class="block text-base md:text-xl font-black text-gray-900">${precio}</span>
+                        <span class="text-[10px] md:text-xs text-gray-400 font-medium">Disp: ${p.cantidad}</span>
                     </div>
+
                     <button onclick="addToCartById('${p.id}'); event.stopPropagation();" 
-                        class="add-btn-direct w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-900 hover:text-white flex items-center justify-center transition-colors shadow-sm active:scale-95">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        class="add-btn-direct w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-100 hover:bg-gray-900 hover:text-white flex items-center justify-center transition-colors shadow-sm active:scale-95 flex-shrink-0">
+                        <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i>
                     </button>
                 </div>
             </div>
