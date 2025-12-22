@@ -871,15 +871,22 @@ async function loadVisitors() {
             if(v.dispositivo && v.dispositivo.toLowerCase().includes('mobile')) icon = 'smartphone';
 
             div.innerHTML = `
+            <div style="display:flex; flex-direction:column;">
                 <span style="color: var(--accent); font-weight:bold;">${v.ip || 'Unknown'}</span>
-                <span class="badge-count">${v.conteo}</span>
-                <span style="font-size: 0.85rem; color: #888;">${fecha}</span>
-                <div style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa;">
-                    <span class="material-icons-round" style="font-size:16px;">${icon}</span>
-                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.dispositivo ? v.dispositivo.substring(0, 15) : 'N/A'}</span>
-                </div>
-            `;
-            container.appendChild(div);
+                <button onclick="banIp('${v.ip}')" style="margin-top:5px; background: #330000; border: 1px solid #500; color: #f88; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; cursor: pointer; width: fit-content;">
+                    🚫 BANEAR
+                </button>
+            </div>
+            
+            <span class="badge-count">${v.conteo}</span>
+            <span style="font-size: 0.85rem; color: #888;">${fecha}</span>
+            
+            <div style="display:flex; align-items:center; gap:5px; font-size:0.8rem; color:#aaa;">
+                <span class="material-icons-round" style="font-size:16px;">${icon}</span>
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.dispositivo ? v.dispositivo.substring(0, 15) : 'N/A'}</span>
+            </div>
+        `;
+        container.appendChild(div);
         });
 
     } catch (e) {
@@ -1010,6 +1017,28 @@ function doLogout() {
     if(confirm("¿Deseas cerrar sesión?")) {
         localStorage.removeItem('manager_token'); // 1. Borramos la "llave"
         window.location.reload(); // 2. Recargamos (ahora sí pedirá login)
+    }
+}
+
+async function banIp(ip) {
+    if(!confirm(`⚠️ ¿Estás SEGURO de bloquear la IP ${ip}?\n\nEsta persona NO podrá volver a entrar a la tienda.`)) return;
+
+    try {
+        const res = await authFetch('/manager/ban-ip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ ip: ip })
+        });
+        
+        if(res && res.ok) {
+            alert(`⛔ La IP ${ip} ha sido enviada a la lista negra.`);
+            // Opcional: Podrías recargar la lista o borrar esa fila visualmente
+        } else {
+            alert("Error al intentar banear.");
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Error de conexión.");
     }
 }
 
