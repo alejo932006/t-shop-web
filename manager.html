@@ -21,23 +21,24 @@
             <p style="color: #666;">Acceso Restringido</p>
         </div>
     
-        <div style="background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid #333; width: 350px; max-width: 90%;">
+        <div style="background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid #333; width: 350px; max-width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
             
             <form onsubmit="event.preventDefault(); doLogin();">
                 
                 <div class="input-icon-group">
                     <input type="text" id="login-user" placeholder="Usuario" autocomplete="username">
-                    <span class="material-icons-round icon">person</span> 
                 </div>
     
                 <div class="input-icon-group">
                     <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password">
-                    <span class="material-icons-round icon">lock</span> 
                 </div>
     
-                <button type="submit" style="width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px;">INGRESAR</button>
+                <button type="submit" style="width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 1rem;">
+                    INGRESAR
+                </button>
             
             </form>
+    
             <p id="login-error" style="color: var(--danger); text-align: center; margin-top: 15px; font-size: 0.9rem; display: none;"></p>
         </div>
     
