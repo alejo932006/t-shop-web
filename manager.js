@@ -777,10 +777,10 @@ async function loadVisitors() {
         }
 
         // Encabezado
-        const header = document.createElement('div');
-        header.className = 'table-header visitor-header';
-        header.innerHTML = `<span>IP</span><span>Visitas</span><span>Última</span><span>Disp.</span>`;
-        container.appendChild(header);
+        // const header = document.createElement('div');
+        // header.className = 'table-header visitor-header';
+        // header.innerHTML = `<span>IP</span><span>Visitas</span><span>Última</span><span>Disp.</span>`;
+        // container.appendChild(header);
 
         data.forEach(v => {
             const div = document.createElement('div');
