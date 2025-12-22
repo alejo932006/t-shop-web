@@ -591,3 +591,8 @@ button.primary { background: var(--accent); color: white; border: none; padding:
 .input-icon-group input:focus + .icon {
     color: var(--accent); /* El icono se pone naranja al escribir */
 }
+
+#login-screen > div:nth-child(2) {
+    width: 350px !important;      /* En PC se queda en 350px */
+    max-width: 90vw !important;   /* En celulares muy pequeños se ajusta al 90% */
+}
