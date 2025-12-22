@@ -543,3 +543,21 @@ button.primary { background: var(--accent); color: white; border: none; padding:
         border: 1px solid #333;
     }
 }
+
+/* Corrección para centrar los inputs */
+.input-icon-group input {
+    width: 100%;
+    background: #252525 !important;
+    border: 1px solid #444 !important;
+    
+    /* Esta es la línea clave que faltaba: */
+    box-sizing: border-box !important; 
+    
+    padding: 15px 15px 15px 45px !important; /* Espacio para el icono */
+    font-size: 1rem !important;
+    color: white !important;
+    border-radius: 12px !important;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    margin: 0 !important; /* Aseguramos que no tenga márgenes extraños */
+}

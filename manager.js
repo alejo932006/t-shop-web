@@ -908,4 +908,22 @@ function processImage(file, callback) {
     };
 }
 
+// --- AUTO-LOGIN AL INICIAR ---
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('manager_token');
+    
+    // Si existe un token guardado, asumimos que estamos logueados
+    if (token) {
+        isLoggedIn = true;
+        document.getElementById('login-screen').style.display = 'none';
+        
+        // Cargar la vista inicial (Pedidos) y activar el botón correspondiente
+        loadOrders();
+        
+        // Activar visualmente el botón de "Pedidos" en el menú lateral y móvil
+        const orderBtns = document.querySelectorAll('button[onclick*="orders"]');
+        orderBtns.forEach(btn => btn.classList.add('active'));
+    }
+});
+
 // loadOrders();
