@@ -926,4 +926,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function doLogout() {
+    if(confirm("¿Deseas cerrar sesión?")) {
+        localStorage.removeItem('manager_token'); // 1. Borramos la "llave"
+        window.location.reload(); // 2. Recargamos (ahora sí pedirá login)
+    }
+}
+
 // loadOrders();
