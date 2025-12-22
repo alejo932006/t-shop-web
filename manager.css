@@ -423,3 +423,123 @@ button.primary { background: var(--accent); color: white; border: none; padding:
         display: flex; gap: 10px;
     }
 }
+
+/* --- LOGIN MÓVIL MEJORADO --- */
+#login-screen {
+    background: #000 !important; /* Fondo negro absoluto */
+}
+
+#login-screen > div:nth-child(2) {
+    width: 90% !important;
+    max-width: 350px;
+    background: #1a1a1a !important;
+    border: 1px solid #333;
+    box-shadow: 0 20px 50px rgba(249, 115, 22, 0.15); /* Resplandor naranja sutil */
+    padding: 30px !important;
+    border-radius: 20px !important;
+}
+
+#login-screen input {
+    background: #252525 !important;
+    border: 1px solid #444 !important;
+    padding: 15px !important; /* Más fácil de tocar */
+    font-size: 16px !important; /* Evita zoom automático en iPhone */
+    border-radius: 12px !important;
+    margin-bottom: 15px !important;
+}
+
+#login-screen button {
+    padding: 15px !important;
+    font-size: 1rem !important;
+    border-radius: 12px !important;
+    background: linear-gradient(to right, #f97316, #ea580c) !important;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+    transition: transform 0.2s;
+}
+
+#login-screen button:active {
+    transform: scale(0.98);
+}
+
+/* Filtros de fecha más grandes en móvil */
+.date-filters {
+    display: flex;
+    gap: 10px;
+    background: #252525;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    width: 100%; /* Ocupar todo el ancho */
+    justify-content: space-between;
+}
+
+.date-filters input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: 'Inter';
+    width: 45%; /* Repartir espacio */
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Tarjetas de Pedido estilo "Ticket" */
+@media (max-width: 768px) {
+    .table-row {
+        background: #161616;
+        border-left: 4px solid var(--accent); /* Borde de color a la izquierda */
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    /* Estado PENDIENTE con borde amarillo */
+    .table-row:has(.st-PENDIENTE) { border-left-color: #FFC107; }
+    /* Estado DESPACHADO con borde verde */
+    .table-row:has(.st-DESPACHADO) { border-left-color: #00C853; }
+
+    /* Hacer el ID y el Nombre más grandes */
+    .table-row .cell-id { font-size: 1.2rem; margin-bottom: 5px; display: block; }
+    .table-row .cell-client { font-size: 1.1rem; color: #fff; font-weight: bold; }
+    
+    /* El total flotando a la derecha abajo */
+    .table-row .cell-total {
+        font-size: 1.4rem;
+        font-weight: 900;
+        background: #222;
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #333;
+    }
+}
+
+/* Layout por defecto (PC) */
+.featured-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+/* Layout Móvil (Una sola columna) */
+@media (max-width: 768px) {
+    .featured-layout {
+        grid-template-columns: 1fr; /* Apilar uno sobre otro */
+        gap: 20px;
+    }
+
+    /* Input de búsqueda más grande */
+    #view-featured input {
+        padding: 15px !important;
+        font-size: 1rem;
+        background: #222 !important;
+        border: 1px solid #444 !important;
+    }
+
+    /* Tarjetas de destacados más amigables */
+    #featured-active-list .order-card, 
+    #featured-search-list .order-card {
+        padding: 15px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+    }
+}
