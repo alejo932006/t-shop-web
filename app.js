@@ -471,24 +471,73 @@ window.closeModal = () => document.getElementById('product-modal').classList.add
 
 function generateFilters() {
     const filterContainer = document.getElementById('category-filters');
+    // Obtenemos las categorías únicas
     const lineas = ['Todas', ...new Set(allProducts.map(p => p.linea || 'General'))];
+
+    // DEFINICIÓN DE COLORES POR CATEGORÍA
+    // Puedes agregar más categorías aquí si tu inventario crece
+    const categoryStyles = {
+        'Todas': {
+            active: 'bg-gray-900 text-white border-gray-900',
+            inactive: 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+        },
+        'Celulares': {
+            active: 'bg-brand-orange text-white border-brand-orange',
+            inactive: 'bg-white text-brand-orange border-brand-orange hover:bg-orange-50'
+        },
+        'Accesorios': { // Cables, Cargadores, etc.
+            active: 'bg-brand-red text-white border-brand-red',
+            inactive: 'bg-white text-brand-red border-brand-red hover:bg-red-50'
+        },
+        'Cases': { // Fundas
+            active: 'bg-brand-yellow text-gray-900 border-brand-yellow',
+            inactive: 'bg-white text-yellow-600 border-brand-yellow hover:bg-yellow-50'
+        },
+        // Estilo por defecto para categorías nuevas (ej: Tablets, Audio)
+        'default': {
+            active: 'bg-gray-700 text-white border-gray-700',
+            inactive: 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+        }
+    };
+
+    // Función auxiliar para obtener las clases según el estado (activo/inactivo)
+    const getBtnClasses = (catName, isActive) => {
+        // Buscamos si existe el color específico, si no, usamos 'default'
+        const style = categoryStyles[catName] || categoryStyles['default'];
+        const baseClasses = "filter-btn px-5 py-2 rounded-full text-sm font-bold border transition-all duration-300 transform";
+        
+        // Efectos extra cuando está activo
+        const stateClasses = isActive 
+            ? `${style.active} shadow-lg scale-105 ring-2 ring-offset-1 ring-transparent` 
+            : `${style.inactive} shadow-sm hover:scale-105`;
+
+        return `${baseClasses} ${stateClasses}`;
+    };
+
+    // 1. Renderizamos los botones
     filterContainer.innerHTML = lineas.map(cat => `
-        <button onclick="filterBy('${cat}')" class="filter-btn px-5 py-2 rounded-full text-sm font-bold border hover:bg-gray-100 transition-all text-gray-600 bg-white">
-            ${cat}
+        <button 
+            onclick="filterBy('${cat}')" 
+            data-category="${cat}"
+            class="${getBtnClasses(cat, cat === 'Todas')}"> ${cat}
         </button>
     `).join('');
     
+    // 2. Definimos la función global filterBy actualizada
     window.filterBy = (catName) => {
-        document.querySelectorAll('.filter-btn').forEach(b => {
-            const isActive = b.innerText.trim() === catName;
-            b.className = isActive 
-                ? "filter-btn px-5 py-2 rounded-full text-sm font-bold border transition-all bg-gray-900 text-white shadow-lg transform scale-105"
-                : "filter-btn px-5 py-2 rounded-full text-sm font-bold border transition-all hover:bg-gray-100 text-gray-600 bg-white";
+        // A. Actualizar visualmente los botones
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const btnCat = btn.getAttribute('data-category');
+            const isActive = btnCat === catName;
+            
+            // Re-calculamos las clases para cada botón según su estado nuevo
+            btn.className = getBtnClasses(btnCat, isActive);
         });
+
+        // B. Filtrar los productos (Lógica original)
         if (catName === 'Todas') renderProducts(allProducts);
         else renderProducts(allProducts.filter(p => (p.linea || 'General') === catName));
     };
-    if(lineas.length > 0) window.filterBy('Todas');
 }
 
 function setMode(mode) {

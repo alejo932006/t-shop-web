@@ -100,8 +100,8 @@ const registrarVisita = async (req) => {
 app.get('/api/products', async (req, res) => {
     registrarVisita(req);
     try {
-      // MODIFICACIÓN: Agregamos WHERE estado = 'Activo'
-      const result = await pool.query("SELECT *, es_destacado FROM productos WHERE estado = 'Activo' ORDER BY nombre");
+      // AQUI EL CAMBIO: Agregamos "AND cantidad > 0"
+      const result = await pool.query("SELECT *, es_destacado FROM productos WHERE estado = 'Activo' AND cantidad > 0 ORDER BY nombre");
       
       const productos = result.rows.map(p => ({
           id: p.codigo,
@@ -290,6 +290,21 @@ app.delete('/api/manager/visitors', verifyToken, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: "Error al limpiar historial" });
+    }
+});
+
+app.delete('/api/manager/product-image/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Ponemos imagen_url en NULL para que el sistema sepa que no tiene foto
+        await pool.query('UPDATE productos SET imagen_url = NULL WHERE codigo = $1', [id]);
+        
+        // Opcional: Aquí podrías agregar código para borrar el archivo físico usando fs.unlink si quisieras
+        
+        res.json({ success: true, message: "Foto desvinculada correctamente" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Error al eliminar foto" });
     }
 });
 
