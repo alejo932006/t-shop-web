@@ -123,9 +123,15 @@ app.post('/api/checkout', async (req, res) => {
     const { nombre, cedula, telefono, email, departamento, ciudad, barrio, direccion, metodo, total, productos } = req.body;
     const resumen = JSON.stringify(productos);
     
+    // 1. CAPTURAR LA IP REAL
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
     try {
-        const query = `INSERT INTO pedidos (cliente_nombre, cliente_cedula, cliente_telefono, cliente_email, cliente_departamento, cliente_ciudad, cliente_barrio, cliente_direccion, metodo_pago, total_venta, detalle_productos) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`;
-        const values = [nombre, cedula, telefono, email, departamento, ciudad, barrio, direccion, metodo, total, resumen];
+        // 2. AGREGAMOS EL CAMPO ip_pedido A LA CONSULTA
+        const query = `INSERT INTO pedidos (cliente_nombre, cliente_cedula, cliente_telefono, cliente_email, cliente_departamento, cliente_ciudad, cliente_barrio, cliente_direccion, metodo_pago, total_venta, detalle_productos, ip_pedido) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`;
+        
+        // 3. AGREGAMOS LA VARIABLE ip AL ARRAY DE VALORES
+        const values = [nombre, cedula, telefono, email, departamento, ciudad, barrio, direccion, metodo, total, resumen, ip];
         
         const result = await pool.query(query, values);
         res.json({ success: true, orderId: result.rows[0].id });
@@ -150,7 +156,7 @@ app.post('/api/manager/login', async (req, res) => {
             const token = jwt.sign(
                 { id: user.id, usuario: user.usuario }, 
                 process.env.JWT_SECRET, 
-                { expiresIn: '8h' } // El token dura 8 horas
+                { expiresIn: '365d' } 
             );
 
             res.json({ success: true, token: token, user: user.usuario });
