@@ -293,7 +293,93 @@
             <div id="category-filters" class="flex flex-wrap justify-center gap-2 mb-8 animate-fade-in">
             </div>
 
-            <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 fade-in"></div>
+            <div class="flex flex-col lg:flex-row gap-8 items-start relative">
+                
+                <aside class="hidden lg:block w-72 flex-shrink-0 sticky top-24 pr-6 h-[calc(100vh-6rem)] overflow-y-auto custom-scrollbar 
+                            border-r border-orange-200/50 
+                            bg-orange-50/60 backdrop-blur-md 
+                            rounded-r-3xl -ml-4 pl-4 py-6 transition-all">
+      
+                    <div class="mb-8">
+                        <h3 class="font-black text-orange-950 mb-4 text-xs uppercase tracking-widest flex items-center gap-2 border-b border-orange-200/50 pb-2">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-brand-orange"></i> Filtros
+                        </h3>
+                        
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-2 pl-2">Ordenar Por</p>
+                            
+                            <button onclick="sortProducts('price-asc')" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/80 hover:text-brand-orange hover:shadow-sm transition-all flex items-center gap-3 group">
+                                <div class="w-4 h-4 rounded-full border-2 border-orange-200 group-hover:border-brand-orange flex items-center justify-center bg-white">
+                                    <div class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                                Menor precio
+                            </button>
+                            <button onclick="sortProducts('price-desc')" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/80 hover:text-brand-orange hover:shadow-sm transition-all flex items-center gap-3 group">
+                                <div class="w-4 h-4 rounded-full border-2 border-orange-200 group-hover:border-brand-orange flex items-center justify-center bg-white">
+                                    <div class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                                Mayor precio
+                            </button>
+                            <button onclick="sortProducts('name-asc')" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/80 hover:text-brand-orange hover:shadow-sm transition-all flex items-center gap-3 group">
+                                <div class="w-4 h-4 rounded-full border-2 border-orange-200 group-hover:border-brand-orange flex items-center justify-center bg-white">
+                                    <div class="w-2 h-2 rounded-full bg-brand-orange opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                                Nombre (A-Z)
+                            </button>
+                        </div>
+                    </div>
+                
+                    <div class="mb-8">
+                        <h3 class="font-black text-orange-950 mb-4 text-xs uppercase tracking-widest flex items-center gap-2 border-b border-orange-200/50 pb-2">
+                            <i data-lucide="layers" class="w-4 h-4 text-brand-orange"></i> Catálogo
+                        </h3>
+                        <ul id="sidebar-categories" class="space-y-2">
+                            <li class="animate-pulse flex space-x-4 px-2">
+                                <div class="h-8 bg-orange-100/50 rounded-lg w-full"></div>
+                            </li>
+                        </ul>
+                    </div>
+                
+                    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-5 text-white shadow-lg border border-gray-700 group cursor-default hover:shadow-orange-500/20 transition-shadow">
+                        <div class="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 rounded-full bg-brand-orange opacity-20 blur-2xl group-hover:opacity-30 transition-opacity"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="p-1.5 bg-orange-500/20 rounded-lg text-brand-orange">
+                                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-orange-50">Compra Segura</h4>
+                            </div>
+                            <p class="text-xs text-gray-400 mb-4 leading-relaxed font-medium">
+                                Soporte técnico directo y garantía real en Colombia.
+                            </p>
+                            <button onclick="openPolicy('warranty')" class="w-full py-2 bg-white/5 border border-white/10 hover:bg-brand-orange hover:border-brand-orange hover:text-white text-gray-300 text-xs font-bold rounded-lg transition-all">
+                                Ver Garantías
+                            </button>
+                        </div>
+                    </div>
+                
+                </aside>
+
+                <div class="flex-1 w-full">
+                    
+                    <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 fade-in"></div>
+                    
+                    <div id="load-more-container" class="hidden text-center mt-12 mb-8">
+                        <button onclick="loadMoreProducts()" class="bg-white border border-gray-300 text-gray-600 hover:text-brand-orange hover:border-brand-orange font-bold py-3 px-8 rounded-full shadow-sm hover:shadow-md transition-all flex items-center gap-2 mx-auto">
+                            <span id="load-more-text">Ver más productos</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <p class="text-xs text-gray-400 mt-2">Mostrando <span id="showing-count">0</span> de <span id="total-count">0</span></p>
+                    </div>
+
+                    <div id="empty-state" class="hidden text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 max-w-2xl mx-auto">
+                        <h4 class="text-xl font-semibold text-gray-700">Inventario Vacío</h4>
+                        <p class="text-gray-500">No hay productos disponibles.</p>
+                    </div>
+                </div>
+
+            </div>
             
             <div id="load-more-container" class="hidden text-center mt-12 mb-8">
                 <button onclick="loadMoreProducts()" class="bg-white border border-gray-300 text-gray-600 hover:text-brand-orange hover:border-brand-orange font-bold py-3 px-8 rounded-full shadow-sm hover:shadow-md transition-all flex items-center gap-2 mx-auto">

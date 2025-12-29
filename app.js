@@ -65,10 +65,8 @@ async function fetchTunnelData() {
         
         allProducts = await res.json();
         
-        // Si hay éxito:
         generateFilters();
-        // IMPORTANTE: Recuerda que cambiamos renderProducts para la paginación
-        // Aquí llamamos a la función que inicia el renderizado
+        renderSidebar(allProducts);
         renderProducts(allProducts); 
         
         // Renderizar carrusel si existe la función
@@ -778,5 +776,77 @@ window.closePolicies = () => {
     document.getElementById('modal-policies').classList.add('hidden');
 };
 
+// ==========================================
+// FUNCIONES BARRA LATERAL (IZQUIERDA)
+// ==========================================
+function renderSidebar(products) {
+    const container = document.getElementById('sidebar-categories');
+    const desktopCounter = document.getElementById('desktop-total-count');
+    
+    if(desktopCounter) desktopCounter.innerText = products.length;
+    if(!container) return;
+    
+    const counts = {};
+    products.forEach(p => {
+        const cat = p.linea || 'Otros';
+        counts[cat] = (counts[cat] || 0) + 1;
+    });
+
+    let html = '';
+
+    // Botón "Ver Todo" (Estilo Tarjeta Blanca Flotante)
+    html += `
+        <li class="mb-3">
+            <button onclick="filterBy('Todas')" class="w-full flex justify-between items-center p-3 rounded-xl bg-white shadow-sm hover:shadow-md border border-orange-100 hover:border-brand-orange transition-all duration-300 group">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-brand-orange flex items-center justify-center group-hover:bg-brand-orange group-hover:text-white transition-colors">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-sm font-bold text-gray-800">Ver Todo</span>
+                </div>
+                <span class="text-[10px] font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-md group-hover:bg-orange-100 group-hover:text-brand-orange transition-colors">${products.length}</span>
+            </button>
+        </li>
+    `;
+
+    // Botones de Categorías (Estilo Transparente)
+    Object.keys(counts).sort().forEach(cat => {
+        html += `
+            <li>
+                <button onclick="filterBy('${cat}')" class="w-full flex justify-between items-center px-3 py-2.5 rounded-xl hover:bg-white/60 hover:shadow-sm border border-transparent hover:border-orange-100 transition-all duration-200 group">
+                    <span class="text-sm font-medium text-gray-700 group-hover:text-brand-orange group-hover:font-bold transition-colors">
+                        ${cat}
+                    </span>
+                    <span class="text-[10px] font-bold text-gray-400 bg-white/50 px-2 py-0.5 rounded-full border border-orange-100/50 group-hover:border-brand-orange/30 group-hover:text-brand-orange transition-colors">
+                        ${counts[cat]}
+                    </span>
+                </button>
+            </li>
+        `;
+    });
+
+    container.innerHTML = html;
+    lucide.createIcons();
+}
+
+window.sortProducts = (criteria) => {
+    // Ordenamos la lista actual
+    let sorted = [...currentListForDisplay];
+    
+    if (criteria === 'price-asc') {
+        sorted.sort((a,b) => Number(a.precio) - Number(b.precio));
+    } else if (criteria === 'price-desc') {
+        sorted.sort((a,b) => Number(b.precio) - Number(a.precio));
+    } else if (criteria === 'name-asc') {
+        sorted.sort((a,b) => a.nombre.localeCompare(b.nombre));
+    }
+    
+    // Renderizamos de nuevo
+    renderProducts(sorted);
+    
+    // --- ELIMINAMOS ESTAS LÍNEAS PARA QUE NO SALTE ---
+    // const gridTop = document.getElementById('products-grid').offsetTop - 150;
+    // window.scrollTo({ top: gridTop, behavior: 'smooth' });
+};
 
 lucide.createIcons();
